@@ -1,0 +1,271 @@
+let createCheckoutUrl = 'https://merchantserver.sandbox.bka.sh/api/checkout/v1.2.0-beta/payment/create';
+let executeCheckoutUrl = 'https://merchantserver.sandbox.bka.sh/api/checkout/v1.2.0-beta/payment/execute';
+let grantTokenUrl = 'https://checkout.sandbox.bka.sh/v1.2.0-beta/checkout/token/grant'; // New line
+let createCheckoutUrl = 'https://checkout.sandbox.bka.sh/v1.2.0-beta/checkout/payment/create'; // Replaced API
+let executeCheckoutUrl = 'https://checkout.sandbox.bka.sh/v1.2.0-beta/checkout/payment/execute'; // Replaced API
+
+
+
+
+let id_token = '';
+
+axios({
+  method: 'post',
+  url: '{base_URL}/tokenized/checkout/token/grant',
+  headers: {
+    'Content-Type': 'application/json',
+    'username': 'shared_name',
+    'password': 'shared_password'
+  },
+  data: {
+    "app_key": "shared_app_key",
+    "app_secret": "shared_app_secret"
+  }
+})
+.then((response) => {
+  const data = response.data;
+  if (data && data.id_token != null) {
+    id_token = data.id_token;
+    document.getElementById('bKash_button').removeAttribute('disabled');
+  }
+})
+.catch((error) => {
+  console.error('Error occurred:', error);
+});
+
+
+axios({
+  method: 'post',
+  url: '{base_URL}/tokenized/checkout/token/refresh',
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'username': 'username', // replace with actual username
+    'password': 'password'  // replace with actual password
+  },
+  data: {
+    "app_key": "test_app_key",        // replace with actual app key
+    "app_secret": "test_app_secret",  // replace with actual app secret
+    "refresh_token": "test_refresh_token"  // replace with actual refresh token
+  }
+})
+.then((response) => {
+  console.log('Success:', response.data);
+})
+.catch((error) => {
+  console.error('Error:', error);
+});
+
+
+axios({
+  method: 'post',
+  url: '{base_URL}/tokenized/checkout/create',  // Replace with the actual base URL
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'authorization': 'id_token', // Replace 'id_token' with the actual token
+    'x-app-key': 'x-app-key'     // Replace 'x-app-key' with the actual app key
+  },
+  data: {
+    "mode": "0000",
+    "callbackURL": "yourdomain.com",      // Replace with the actual callback URL
+    "payerReference": "0173499999"        // Replace with the actual payer reference
+  }
+})
+.then((response) => {
+  console.log('Success:', response.data);
+})
+.catch((error) => {
+  console.error('Error:', error);
+});
+
+
+
+axios({
+  method: 'post',
+  url: '{base_URL}/tokenized/checkout/execute',  // Replace with the actual base URL
+  headers: {
+    'Accept': 'application/json',
+    'authorization': 'id_token',  // Replace 'id_token' with the actual token
+    'x-app-key': 'x-app-key'      // Replace 'x-app-key' with the actual app key
+  },
+  data: {
+    'paymentID': 'TR00008C1565071974689'  // Replace with the actual payment ID
+  }
+})
+.then((response) => {
+  console.log('Success:', response.data);
+})
+.catch((error) => {
+  console.error('Error:', error);
+});
+
+axios({
+  method: 'post',
+  url: '{base_URL}/tokenized/checkout/agreement/status',  // Replace with the actual base URL
+  headers: {
+    'Accept': 'application/json',
+    'authorization': 'id_token',  // Replace 'id_token' with the actual token
+    'x-app-key': 'x-app-key'      // Replace with the actual app key
+  },
+  data: {
+    'agreementID': 'TokenizedMerchant02WKKY9151563093754275'  // Replace with the actual agreement ID
+  }
+})
+.then((response) => {
+  console.log('Success:', response.data);
+})
+.catch((error) => {
+  console.error('Error:', error);
+});
+
+
+axios({
+  method: 'post',
+  url: '{base_URL}/tokenized/checkout/agreement/cancel',  // Replace with the actual base URL
+  headers: {
+    'Accept': 'application/json',
+    'authorization': 'id_token',  // Replace 'id_token' with the actual token
+    'x-app-key': 'x-app-key'      // Replace with the actual app key
+  },
+  data: {
+    'agreementID': 'TokenizedMerchant02WKKY9151563093754275'  // Replace with the actual agreement ID
+  }
+})
+.then((response) => {
+  console.log('Success:', response.data);
+})
+.catch((error) => {
+  console.error('Error:', error);
+});
+
+
+axios({
+  method: 'post',
+  url: '{base_URL}/tokenized/checkout/create',  // Replace with the actual base URL
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'authorization': 'id_token',  // Replace 'id_token' with the actual token
+    'x-app-key': 'x-app-key'      // Replace with the actual app key
+  },
+  data: {
+    'agreementID': 'TokenizedMerchant01L3IKB6H1565072174986',  // Replace with the actual agreement ID
+    'mode': '0001',
+    'payerReference': '01723888888',  // Replace with the actual payer reference
+    'callbackURL': 'yourDomain.com',  // Replace with your actual callback URL
+    'merchantAssociationInfo': 'MI05MID54RF09123456One',  // Replace with the actual info
+    'amount': '12',  // Replace with the actual amount
+    'currency': 'BDT',
+    'intent': 'sale',
+    'merchantInvoiceNumber': 'Inv0124'  // Replace with the actual invoice number
+  }
+})
+.then((response) => {
+  console.log('Success:', response.data);
+})
+.catch((error) => {
+  console.error('Error:', error);
+});
+
+
+
+
+axios({
+  method: 'post',
+  url: '{base_URL}/tokenized/checkout/execute',  // Replace with the actual base URL
+  headers: {
+    'Accept': 'application/json',
+    'authorization': 'id_token',  // Replace 'id_token' with the actual token
+    'x-app-key': 'x-app-key'      // Replace with the actual app key
+  },
+  data: {
+    'paymentID': 'TR0001VK1565072365492'  // Replace with the actual payment ID
+  }
+})
+.then((response) => {
+  console.log('Success:', response.data);
+})
+.catch((error) => {
+  console.error('Error:', error);
+});
+
+
+
+axios({
+  method: 'post',
+  url: '{base_URL}/tokenized/checkout/payment/status',  // Replace with the actual base URL
+  headers: {
+    'Accept': 'application/json',
+    'authorization': 'id_token',  // Replace 'id_token' with the actual token
+    'x-app-key': 'x-app-key'      // Replace with the actual app key
+  },
+  data: {
+    'paymentID': 'TR0001IV1565085942653'  // Replace with the actual payment ID
+  }
+})
+.then((response) => {
+  console.log('Success:', response.data);
+})
+.catch((error) => {
+  console.error('Error:', error);
+});
+
+
+axios({
+  method: 'post',
+  url: '{base_URL}/tokenized/checkout/general/searchTransaction',  // Replace with the actual base URL
+  headers: {
+    'Accept': 'application/json',
+    'authorization': 'id_token',  // Replace 'id_token' with the actual token
+    'x-app-key': 'x-app-key'      // Replace with the actual app key
+  },
+  data: {
+    'trxID': '6HXXXXXT'  // Replace with the actual transaction ID
+  }
+})
+.then((response) => {
+  console.log('Success:', response.data);
+})
+.catch((error) => {
+  console.error('Error:', error);
+});
+
+
+axios({
+  method: 'get',
+  url: '{base_URL}/checkout/payment/organizationBalance',  // Replace with the actual base URL
+  headers: {
+    'Accept': 'application/json',
+    'authorization': 'id_token',  // Replace 'id_token' with the actual token
+    'x-app-key': 'x-app-key'      // Replace with the actual app key
+  }
+})
+.then((response) => {
+  console.log('Success:', response.data);
+})
+.catch((error) => {
+  console.error('Error:', error);
+});
+
+
+axios({
+  method: 'post',
+  url: '{base_URL}/checkout/payment/intraAccountTransfer',  // Replace with the actual base URL
+  headers: {
+    'Accept': 'application/json',
+    'authorization': 'id_token',  // Replace 'id_token' with the actual token
+    'x-app-key': 'x-app-key'      // Replace with the actual app key
+  },
+  data: {
+    'amount': '10',                // Replace with the actual amount
+    'currency': 'BDT',
+    'transferType': 'Collection2Disbursement'  // Replace with the actual transfer type if necessary
+  }
+})
+.then((response) => {
+  console.log('Success:', response.data);
+})
+.catch((error) => {
+  console.error('Error:', error);
+});

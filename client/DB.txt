@@ -1,0 +1,85 @@
+user ={
+    _id:
+    fullName: 'Shuvo',
+    username: 'shuvo',
+    email: 'a@3.com',
+    avatar:'',
+    password: '',
+    shippingAddress:{address id},
+    orders:[
+        {order id},
+        {order id},
+    ],
+}
+
+
+address = {
+    _id:
+    firstName: "Jubayer",
+    lastName: "Khan",
+    address1: "Daulatpur Kushtia",
+    address2: "Bejpur",
+    countryCode: "+880",
+    mobileNumber: "1964753086",
+    city: "Dhaka",
+    zip: "7051",
+    state: "Dhaka",
+    country: "Bangladesh",
+}
+
+
+product = {
+    _id:
+    seller:'Admin'
+    title: "Cool Product 1",
+    description: "This is an awesome product you should definitely buy!",
+    rgularPrice: 49.99,
+    discount: 10,
+    price: 44.99,
+    inStock: true,
+    availableSize:[
+        "M",
+        "L"
+    ],
+    selectedSize:'M',
+    imageUrl:
+      "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/ff35ea208344565.66ecec5747d1a.jpg",
+    imageAlt:
+      "product.jpg",
+    images: [
+      "https://i.ebayimg.com/images/g/qzkAAOSwlMdl1CUe/s-l1600.jpg",
+      "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQlFv6cG_K0xCde7su8vOX9c9LRiwcJ3WEUX118uVAYRQIvXRD1",
+    ],
+    reviews: [
+        {reviews id},
+        {reviews id},
+        {reviews id},
+    ],
+
+}
+reviews = {
+    _id:
+    star: 5,
+    text: 'good',
+    user: {_id},
+}
+
+
+order = {
+    _id:
+    date:date.now,
+    total:456,
+    status:'placed',
+    message:'',
+    products:[
+        {product},
+        {product},
+    ],
+    user:{user id},
+    shippingAddress:{
+        address
+    },
+    shippingCost:5,
+    discount:123,
+    cuponDiscount:87,
+}

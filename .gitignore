@@ -1,0 +1,43 @@
+# Node modules
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+
+# Binaries
+*.exe
+*.out
+*.app
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Optional lock files (if not needed)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Coverage directory (if using Jest or other testing tools)
+coverage/
+
+# Build directories (if using any transpilers or bundlers)
+dist/
+build/
+
+# IDE config files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Temporary files
+tmp/
+temp/

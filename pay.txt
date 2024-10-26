@@ -1,0 +1,36 @@
+tran_id: 'jubayer_shuvo9426',
+  val_id: '2410182241546HAuOStWxZ6ueDg',
+  amount: '910.00',
+  card_type: 'BKASH-BKash',
+  store_amount: '887.25',
+  card_no: '',
+  bank_tran_id: '241018224154N2DbK74CuZpiUyV',
+  status: 'VALID',
+  tran_date: '2024-10-18 22:41:49',
+  error: '',
+  currency: 'BDT',
+  card_issuer: 'BKash Mobile Banking',
+  card_brand: 'MOBILEBANKING',
+  card_sub_brand: 'Classic',
+  card_issuer_country: 'Bangladesh',
+  card_issuer_country_code: 'BD',
+  store_id: 'self671270aca3247',
+  verify_sign: '0a343ba0a6ecd61e34a1e102e6353911',
+  verify_key: 'amount,bank_tran_id,base_fair,card_brand,card_issuer,card_issuer_country,card_issuer_country_code,card_no,card_sub_brand,card_type,currency,currency_amount,currency_rate,currency_type,error,risk_level,risk_title,status,store_amount,store_id,tran_date,tran_id,val_id,value_a,value_b,value_c,value_d',
+  verify_sign_sha2: 'c5bb86585d58a1d5fb422a9b0a9d28447319ec8c48a065bee48a6cd105e789db',
+  currency_type: 'BDT',
+  currency_amount: '910.00',
+  currency_rate: '1.0000',
+  base_fair: '0.00',
+  value_a: '',
+  value_b: '',
+  value_c: '',
+  value_d: '',
+  subscription_id: '',
+  risk_level: '0',
+  risk_title: 'Safe'
+
+
+  sb-jesav33443536@personal.example.com
+
+  G=R_di2J
