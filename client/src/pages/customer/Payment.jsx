@@ -159,20 +159,6 @@ function PaymentPage() {
                     Credit/Debit Card
                   </span>
                 </label>
-
-                <label className="block">
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="other"
-                    checked={paymentMethod === "other"}
-                    onChange={() => setPaymentMethod("other")}
-                    className="mr-2 dark:bg-gray-700"
-                  />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
-                    Other Options
-                  </span>
-                </label>
               </div>
 
               {/* Submit Button */}

@@ -25,7 +25,7 @@ const ProductRatings = ({ reviews, averageStar }) => {
       setRatingsCount(counts);
     }
   }, [reviews]);
-  console.log(reviews?.length)
+
 
   const totalRatings = reviews?.length;
   const ratingDetails = [

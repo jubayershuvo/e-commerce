@@ -3,45 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Floating Label Input</title>
-    <style>
-      body div {
-        position: relative;
-        margin: 30px;
-      }
-      div label {
-        position: absolute;
-        z-index: 1;
-        font-family: sans-serif;
-        left: 10px;
-        top: 7px;
-        opacity: 0.8;
-        transition: 0.2s ease all;
-        pointer-events: none;
-      }
-      div input {
-        height: 30px;
-        width: 200px;
-        border-radius: 10px;
-        border: none;
-        outline: none;
-        box-shadow: 1px 2px 4px;
-        padding-left: 15px;
-      }
-      /* This moves the label up when input is focused */
-      div input:focus ~ label,
-      div input:not(:placeholder-shown) ~ label {
-        top: -17px;
-        left: 10px;
-        font-size: 14px;
-        opacity: 1;
-      }
-    </style>
+    <title>Login</title>
   </head>
+  <link rel="stylesheet" href="style.css">
   <body>
-    <div class="area">
-      <input type="text" id="input" placeholder=" " />
-      <label for="input">Enter your name</label>
+
+    <div class="main">
+      <h1>Login</h1>
+      <div class="email">
+        <label for="email">Email and username</label>
+        <input id="email" type="text">
+      </div>
+      <div class="password">
+        <label for="password">Password</label>
+        <input id="password" type="text">
+      </div>
+      <button class="btn">Submit</button>
     </div>
+ 
   </body>
 </html>

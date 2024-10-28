@@ -96,13 +96,12 @@ const AddProduct = () => {
     const addProductLoading = toast.loading("Adding product");
     try {
       const data = new FormData();
-      const imagesData = new FormData();
 
       if (genderName) {
         if (!categoryName) {
           toast.error("Select category..!");
           return;
-        } else if (subCategoryName) {
+        } else if (!subCategoryName) {
           toast.error("Select Sub-Category..!");
           return;
         }
@@ -127,9 +126,6 @@ const AddProduct = () => {
       images.forEach((img) => {
         data.append(`images`, img);
       });
-      for (let [key, value] of imagesData.entries()) {
-        console.log(key, value); // Should print each key-value pair in FormData
-      }
       // Send the FormData to the server (replace with your server URL)
       const response = await axios.post("/admin/product/add", data);
       if (response.data) {
@@ -365,11 +361,12 @@ const AddProduct = () => {
               htmlFor="image"
               className="block text-sm md:text-base font-medium"
             >
-              Product Image
+              Main Product Image
             </label>
             <input
               type="file"
               id="image"
+              accept="image/*" // This restricts file input to only image files
               onChange={handleImageChange}
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-indigo-400"
             />
@@ -391,6 +388,7 @@ const AddProduct = () => {
             <input
               type="file"
               id="otherimages"
+              accept="image/*"
               onChange={handleImagesChange}
               multiple // Allow multiple files
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-indigo-400"

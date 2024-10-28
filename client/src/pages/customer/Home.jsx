@@ -48,7 +48,7 @@ function Home() {
     fetch()
   }, [])
   return (
-    <div className="bg-white dark:bg-gray-800 min-h-screen dark:text-white">
+    <div className="bg-white custom-scrollbar dark:bg-gray-800 min-h-screen dark:text-white">
       <div className="pb-5 m-auto">
         <div className="mx-4">
           <MainCarousel banners={banners} />

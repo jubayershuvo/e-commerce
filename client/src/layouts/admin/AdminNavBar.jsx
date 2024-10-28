@@ -5,11 +5,11 @@ import {
   XMarkIcon,
   UserIcon,
   ShoppingBagIcon,
-  PlusIcon, 
+  PlusIcon,
   ClipboardDocumentListIcon,
-  CreditCardIcon
+  CreditCardIcon,
 } from "@heroicons/react/24/solid";
-import {useDispatch, useSelector} from 'react-redux'
+import { useDispatch, useSelector } from "react-redux";
 
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import DarkMode from "../../components/DarkMode";
@@ -18,44 +18,46 @@ import axios from "axios";
 import { adminLogout } from "../../store/adminSlice";
 
 const AdminNavbar = () => {
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { isAdminLoggedIn, admin } = useSelector((state) => state.adminAuth);
   useEffect(() => {
-    if(!isAdminLoggedIn){
-      navigate('/admin/login')
+    if (!isAdminLoggedIn) {
+      navigate("/admin/login");
     }
   }, [isAdminLoggedIn, navigate]);
 
   useEffect(() => {
-    if(isAdminLoggedIn === true){
-      const checkLocalCookie = async() => {
-        const cookies = document.cookie.split('; ');
-        const cookieName = 'adminVerify';
-        const exists = cookies.some(cookie => cookie.startsWith(`${cookieName}=`));
+    if (isAdminLoggedIn === true) {
+      const checkLocalCookie = async () => {
+        const cookies = document.cookie.split("; ");
+        const cookieName = "adminVerify";
+        const exists = cookies.some((cookie) =>
+          cookie.startsWith(`${cookieName}=`)
+        );
         if (exists) {
           return;
         } else {
           try {
-            await axios.post('/admin/refresh-token', {adminRefreshToken: admin.adminRefreshToken});
+            await axios.post("/admin/refresh-token", {
+              adminRefreshToken: admin.adminRefreshToken,
+            });
           } catch (error) {
-            console.log(error)
-            dispatch(adminLogout())
+            console.log(error);
+            dispatch(adminLogout());
           }
         }
       };
-  
+
       checkLocalCookie();
     }
-    return
-  }, [isAdminLoggedIn, admin, dispatch])
-  
-  
+    return;
+  }, [isAdminLoggedIn, admin, dispatch]);
 
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-slate-900">
-      <Toaster position="top-center"/>
+      <Toaster position="top-center" />
       {/* Fixed sidebar for desktop */}
       <div className="hidden md:flex flex-col w-64 bg-white dark:bg-gray-900 h-screen fixed">
         <div className="flex items-center justify-between px-4 py-4 border-b dark:border-gray-700">
@@ -90,7 +92,7 @@ const AdminNavbar = () => {
             to="/admin/orders"
             className="flex mb-3 items-center text-blue-600"
           >
-            <ClipboardDocumentListIcon  className="h-6 w-6 mr-2" />
+            <ClipboardDocumentListIcon className="h-6 w-6 mr-2" />
             Orders
           </NavLink>
 
@@ -106,7 +108,7 @@ const AdminNavbar = () => {
             to="/admin/product/add"
             className="flex mb-3 items-center text-blue-600"
           >
-            <PlusIcon  className="h-6 w-6 mr-2" />
+            <PlusIcon className="h-6 w-6 mr-2" />
             Add Product
           </NavLink>
         </nav>
@@ -150,18 +152,34 @@ const AdminNavbar = () => {
                 Customers
               </NavLink>
               <NavLink
-                to="/admin/customers"
-                className="flex mb-3 items-center text-blue-600"
-              >
-                <UserIcon className="h-6 w-6 mr-2" />
-                Customers
-              </NavLink>
-              <NavLink
                 to="/admin/products"
                 className="flex mb-3 items-center text-blue-600"
               >
                 <ShoppingBagIcon className="h-6 w-6 mr-2" />
                 Products
+              </NavLink>
+              <NavLink
+                to="/admin/orders"
+                className="flex mb-3 items-center text-blue-600"
+              >
+                <ClipboardDocumentListIcon className="h-6 w-6 mr-2" />
+                Orders
+              </NavLink>
+
+              <NavLink
+                to="/admin/payments"
+                className="flex mb-3 items-center text-blue-600"
+              >
+                <CreditCardIcon className="h-6 w-6 mr-2" />
+                Payments
+              </NavLink>
+
+              <NavLink
+                to="/admin/product/add"
+                className="flex mb-3 items-center text-blue-600"
+              >
+                <PlusIcon className="h-6 w-6 mr-2" />
+                Add Product
               </NavLink>
             </nav>
           </div>

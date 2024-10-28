@@ -217,12 +217,12 @@ if(loading){
           {/* Reviews*/}
 
           {totalReviews > 0 ?
-            product.reviews.map((review) => (
+            product.reviews.map((review, i) => (
               <div
-                key={review._id}
+                key={i}
                 className="border-b border-gray-200 dark:border-gray-700 pb-4"
               >
-                <p className="font-semibold">{review.user.fullname}</p>
+                <p className="font-semibold">{review.user?.fullname}</p>
 
                 <div className="flex text-yellow-500">
                   {Array.from({ length: 5 }, (v, i) => {

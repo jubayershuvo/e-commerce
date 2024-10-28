@@ -8,10 +8,19 @@ import { Product } from "../models/productModel.js";
 import { sendEmail } from "../utils/mailer.js";
 import mongoose from "mongoose";
 import { Category, Gender, SubCategory } from "../models/categoryModel.js";
+import { Review } from "../models/reviewModel.js";
 
 export const addProduct = asyncHandler(async (req, res) => {
-  const { genderName, categoryName, subCategoryName, title, description, regularPrice, discount, availableSize } =
-    req.body;
+  const {
+    genderName,
+    categoryName,
+    subCategoryName,
+    title,
+    description,
+    regularPrice,
+    discount,
+    availableSize,
+  } = req.body;
   const { productImage, images } = req.files;
   try {
     if (!title) {
@@ -26,11 +35,17 @@ export const addProduct = asyncHandler(async (req, res) => {
     if (!productImage) {
       throw new ApiError(400, "Product Image is required...!");
     }
-    const gender = await Gender.findOne({name: genderName});
-    
-    const category = await Category.findOne({name: categoryName, gender: gender?._id});
-    
-    const subCategory = await SubCategory.findOne({name: subCategoryName, category: category?._id})
+    const gender = await Gender.findOne({ name: genderName });
+
+    const category = await Category.findOne({
+      name: categoryName,
+      gender: gender?._id,
+    });
+
+    const subCategory = await SubCategory.findOne({
+      name: subCategoryName,
+      category: category?._id,
+    });
     const product = await Product.create({
       title,
       description,
@@ -39,7 +54,7 @@ export const addProduct = asyncHandler(async (req, res) => {
       availableSize: availableSize.split(","),
       gender: gender?._id,
       category: category?._id,
-      subCategory:subCategory?._id
+      subCategory: subCategory?._id,
     });
     if (!product) {
       throw new ApiError(500, "Product save faild");
@@ -150,7 +165,7 @@ export const updateProductInfo = asyncHandler(async (req, res) => {
         },
         { new: true }
       );
-      const products = await Product.find().sort({createdAt: -1})
+      const products = await Product.find().sort({ createdAt: -1 });
       return res
         .status(201)
         .json(
@@ -250,16 +265,22 @@ export const findProductByCategory = asyncHandler(async (req, res) => {
     if (!genderName || !categoryName || !subCategoryName) {
       throw new ApiError(400, "Something is missing..!");
     }
-    const gender = await Gender.findOne({name: genderName});
-    
-    const category = await Category.findOne({name: categoryName, gender: gender?._id});
-    
-    const subCategory = await SubCategory.findOne({name: subCategoryName, category: category?._id})
+    const gender = await Gender.findOne({ name: genderName });
+
+    const category = await Category.findOne({
+      name: categoryName,
+      gender: gender?._id,
+    });
+
+    const subCategory = await SubCategory.findOne({
+      name: subCategoryName,
+      category: category?._id,
+    });
 
     const products = await Product.find({
       gender: gender?._id,
       category: category?._id,
-      subCategory: subCategory?._id
+      subCategory: subCategory?._id,
     });
     if (!products) {
       throw new ApiError(400, "Products not found..!");
@@ -286,7 +307,7 @@ export const findProductById = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Product ID invalid..!");
     }
 
-    const product = await Product.findById(_id);
+    const product = await Product.findById(_id).populate("reviews");
     if (!product) {
       throw new ApiError(400, "Product not found..!");
     }
@@ -296,6 +317,53 @@ export const findProductById = asyncHandler(async (req, res) => {
   } catch (error) {
     return res.status(error.statusCode || 500).json({
       status: error.statusCode,
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+export const givReview = asyncHandler(async (req, res) => {
+  try {
+    const { _id, star, review } = req.body;
+    const userId = req.user._id;
+
+    // Check if necessary fields are provided
+    if (!_id || !star || !review) {
+      throw new ApiError(400, "Something missing...!");
+    }
+
+    // Check if the user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new ApiError(400, "User missing...!");
+    }
+
+    // Create the review
+    const createdReview = await Review.create({
+      star,
+      text: review,
+      user: userId,
+    });
+
+    // Add the review to the product
+    const product = await Product.findByIdAndUpdate(
+      _id,
+      {
+        $push: { reviews: createdReview._id },
+      },
+      { new: true }
+    );
+    if (!product) {
+      throw new ApiError(400, "Product missing...!");
+    }
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "User returned..!", product));
+  } catch (error) {
+    // Error handling
+    return res.status(error.statusCode || 500).json({
+      status: error.statusCode || 500,
       success: false,
       message: error.message,
     });
