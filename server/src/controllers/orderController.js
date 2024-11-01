@@ -4,6 +4,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { Order } from "../models/orderModel.js";
 import { User } from "../models/userModel.js";
 import { Product } from "../models/productModel.js";
+import { Coupon } from "../models/couponModel.js";
 
 export const addOrder = asyncHandler(async (req, res) => {
   try {
@@ -292,6 +293,94 @@ export const updateStatus = asyncHandler(async (req, res) => {
     console.error(error);
 
     // Return appropriate error response
+    return res.status(error.statusCode || 500).json({
+      status: error.statusCode || 500,
+      success: false,
+      message: error.message || "Something went wrong!",
+    });
+  }
+});
+export const addCoupon = asyncHandler(async (req, res) => {
+  try {
+    const { code, discount } = req.body;
+
+    if (!code) {
+      throw new ApiError(404, "Enter code");
+    }
+    if (!discount) {
+      throw new ApiError(404, "Enter code");
+    }
+    const existCoupon = await Coupon.findOne({ code });
+    if (existCoupon) {
+      throw new ApiError(404, "Coupon already exist");
+    }
+
+    const coupon = await Coupon.create({
+      code: code.toUpperCase(),
+      discount,
+    });
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Order fetched successfully!", coupon));
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      status: error.statusCode || 500,
+      success: false,
+      message: error.message || "Something went wrong!",
+    });
+  }
+});
+export const getCoupon = asyncHandler(async (req, res) => {
+  try {
+    const { code } = req.params;
+
+    if (!code) {
+      throw new ApiError(404, "Enter code");
+    }
+    const coupon = await Coupon.findOne({ code });
+    if (!coupon) {
+      throw new ApiError(404, "Wrong cupon..!");
+    }
+    // Return 200 for successful fetching
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Coupon fetched successfully!", coupon));
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      status: error.statusCode || 500,
+      success: false,
+      message: error.message || "Something went wrong!",
+    });
+  }
+});
+export const getAllCoupon = asyncHandler(async (req, res) => {
+  try {
+    const coupons = await Coupon.find();
+    if (!coupons) {
+      throw new ApiError(404, "Wrong cupon..!");
+    }
+    // Return 200 for successful fetching
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Coupon fetched successfully!", coupons));
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      status: error.statusCode || 500,
+      success: false,
+      message: error.message || "Something went wrong!",
+    });
+  }
+});
+export const deleteCoupon = asyncHandler(async (req, res) => {
+  try {
+    const { _id } = req.params;
+
+    await Coupon.findByIdAndDelete(_id);
+    const coupons = await Coupon.find();
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Coupon fetched successfully!", coupons));
+  } catch (error) {
     return res.status(error.statusCode || 500).json({
       status: error.statusCode || 500,
       success: false,

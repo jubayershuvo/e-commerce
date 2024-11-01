@@ -3,6 +3,7 @@ import { Order } from "../models/orderModel.js";
 import { Payment } from "../models/paymentModel.js";
 import { cors_origin } from "../variables.js";
 import { ApiError } from "../utils/apiError.js";
+import { ApiResponse } from "../utils/apiResponse.js";
 
 export const deliveryCreate = asyncHandler(async (req, res) => {
   try {
@@ -11,7 +12,8 @@ export const deliveryCreate = asyncHandler(async (req, res) => {
 
     const order = await Order.findById(orderId);
     if(order.status === "confirmed"){
-      throw ApiError(400, "Order already confirmed")
+      const url = `${cors_origin}/order/${orderId}`;
+      return res.status(200).json(new ApiResponse(200, "User updated successfully.", url));
     }
 
     const payment = await Payment.create({
@@ -41,7 +43,7 @@ export const deliveryCreate = asyncHandler(async (req, res) => {
         { new: true }
       );
 
-      const url = `${cors_origin}/paymentInfo/success?oderId=${orderId}`;
+      const url = `${cors_origin}/paymentInfo?status=success&orderId=${orderId}`;
 
       return res.status(200).json(new ApiResponse(200, "User updated successfully.", url));
 

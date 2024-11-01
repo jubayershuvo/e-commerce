@@ -1,10 +1,11 @@
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Payment } from "../models/paymentModel.js";
+import { ApiError } from "../utils/apiError.js";
 
 export const allPayments = asyncHandler(async (req, res) => {
   try {
-    const payments = await Payment.find();
+    const payments = await Payment.find().sort({createdAt: -1});
     return res
       .status(200)
       .json(new ApiResponse(200, "User updated successfully.", payments));
@@ -19,7 +20,10 @@ export const allPayments = asyncHandler(async (req, res) => {
 export const singlePayment = asyncHandler(async (req, res) => {
   try {
     const { _id } = req.params;
-    const payment = await Payment.findById(_id);
+    const payment = await Payment.findById(_id).populate('user');
+    if(!payment){
+      throw new ApiError(404,"Payment not found..!")
+    }
     return res
       .status(200)
       .json(new ApiResponse(200, "Payment found successfully.", payment));

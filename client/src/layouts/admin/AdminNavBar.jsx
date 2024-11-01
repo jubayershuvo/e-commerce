@@ -11,11 +11,13 @@ import {
 } from "@heroicons/react/24/solid";
 import { useDispatch, useSelector } from "react-redux";
 
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import DarkMode from "../../components/DarkMode";
 import { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { adminLogout } from "../../store/adminSlice";
+import { AdjustmentsVerticalIcon } from "@heroicons/react/24/outline";
+import { FaTag } from "react-icons/fa";
 
 const AdminNavbar = () => {
   const navigate = useNavigate();
@@ -62,18 +64,21 @@ const AdminNavbar = () => {
       <div className="hidden md:flex flex-col w-64 bg-white dark:bg-gray-900 h-screen fixed">
         <div className="flex items-center justify-between px-4 py-4 border-b dark:border-gray-700">
           <span className="text-2xl font-bold text-gray-900 dark:text-white">
-            Logo
+            <Link to={"/admin"}>
+              <img src="/logo.png" alt="" className="h-6" />
+            </Link>
           </span>
           <DarkMode />
         </div>
         <nav className="flex-grow px-4 py-6">
           <NavLink
             to="/admin"
-            className="flex mb-3 items-center text-blue-600 "
+            className={`flex mb-3 items-center !text-green-600`}
           >
             <ChartBarIcon className="h-6 w-6 mr-2" />
             Dashboard
           </NavLink>
+          <hr className=" opacity-50 mb-5" />
           <NavLink
             to="/admin/customers"
             className="flex mb-3 items-center text-blue-600"
@@ -111,6 +116,20 @@ const AdminNavbar = () => {
             <PlusIcon className="h-6 w-6 mr-2" />
             Add Product
           </NavLink>
+          <NavLink
+            to="/admin/categories"
+            className="flex mb-3 items-center text-blue-600"
+          >
+            <AdjustmentsVerticalIcon className="h-6 w-6 mr-2" />
+            Manage category
+          </NavLink>
+          <NavLink
+            to="/admin/coupons"
+            className="flex mb-3 items-center text-blue-600"
+          >
+            <FaTag className="h-6 w-6 mr-2" />
+            Manage coupons
+          </NavLink>
         </nav>
       </div>
 
@@ -138,12 +157,14 @@ const AdminNavbar = () => {
           <div className="w-64 bg-white dark:bg-gray-900 h-screen shadow-lg">
             <nav className="px-4 py-6">
               <NavLink
+                onClick={() => setSidebarOpen(false)}
                 to="/admin"
-                className="flex mb-3 items-center text-blue-600 "
+                className="flex mb-3 items-center !text-green-600 "
               >
                 <ChartBarIcon className="h-6 w-6 mr-2" />
                 Dashboard
               </NavLink>
+              <hr className="mb-5"/>
               <NavLink
                 to="/admin/customers"
                 className="flex mb-3 items-center text-blue-600"
@@ -152,6 +173,7 @@ const AdminNavbar = () => {
                 Customers
               </NavLink>
               <NavLink
+                onClick={() => setSidebarOpen(false)}
                 to="/admin/products"
                 className="flex mb-3 items-center text-blue-600"
               >
@@ -159,6 +181,7 @@ const AdminNavbar = () => {
                 Products
               </NavLink>
               <NavLink
+                onClick={() => setSidebarOpen(false)}
                 to="/admin/orders"
                 className="flex mb-3 items-center text-blue-600"
               >
@@ -167,6 +190,7 @@ const AdminNavbar = () => {
               </NavLink>
 
               <NavLink
+                onClick={() => setSidebarOpen(false)}
                 to="/admin/payments"
                 className="flex mb-3 items-center text-blue-600"
               >
@@ -175,11 +199,27 @@ const AdminNavbar = () => {
               </NavLink>
 
               <NavLink
+                onClick={() => setSidebarOpen(false)}
                 to="/admin/product/add"
                 className="flex mb-3 items-center text-blue-600"
               >
                 <PlusIcon className="h-6 w-6 mr-2" />
                 Add Product
+              </NavLink>
+              <NavLink
+                onClick={() => setSidebarOpen(false)}
+                to="/admin/categories"
+                className="flex mb-3 items-center text-blue-600"
+              >
+                <AdjustmentsVerticalIcon className="h-6 w-6 mr-2" />
+                Manage category
+              </NavLink>
+              <NavLink
+                to="/admin/coupons"
+                className="flex mb-3 items-center text-blue-600"
+              >
+                <FaTag className="h-6 w-6 mr-2" />
+                Manage coupons
               </NavLink>
             </nav>
           </div>

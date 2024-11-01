@@ -30,9 +30,11 @@ const ProductCard = ({ product }) => {
   return (
     <div className="bg-white relative text-xs z-50 md:text-base dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden flex flex-col justify-between hover:shadow-xl transform hover:scale-105 transition duration-300">
       {product.inStock === true && (
-        <div className="bg-transparent w-20 h-20 absolute z-50 -right-2 top-2 rounded-lg">
+        <div className="bg-transparent text-right w-20 h-20 absolute z-50 -right-6 top-0 rounded-lg">
           {product.discount > 0 && (
-            <p className="text-green-800 text-lg">{product.discount}% Off</p>
+            <div className="w-14 h-6 bg-orange-400 rounded-lg text-center p-1">
+              <p className="text-green-900 text-xs">{product.discount}% Off</p>
+            </div>
           )}
         </div>
       )}

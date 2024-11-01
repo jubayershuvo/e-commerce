@@ -15,7 +15,7 @@ function DeliveryAddress({ handleNext, user }) {
     { value: "+44", label: "Uk +44" },
     { value: "+880", label: "BD +880" },
   ];
-  const oldAddress = user.shippingAddress;
+  const oldAddress = user?.shippingAddress;
   const [data, setData] = React.useState({
     firstName: "",
     lastName: "",

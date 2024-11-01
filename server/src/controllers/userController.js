@@ -1,6 +1,10 @@
 import jwt from "jsonwebtoken";
 import otpGenerator from "otp-generator";
-import { environment, refresh_token_secret_key, smtp_username } from "../variables.js";
+import {
+  environment,
+  refresh_token_secret_key,
+  smtp_username,
+} from "../variables.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -8,6 +12,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import deleteCloudinaryFolder from "../utils/cloudinaryFolderDelete.js";
 import { User } from "./../models/userModel.js";
 import { sendEmail } from "../utils/mailer.js";
+import { Category, Gender, SubCategory } from "../models/categoryModel.js";
 
 const genAccessAndRefreshToken = async (userId) => {
   try {
@@ -330,7 +335,6 @@ export const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
-
 export const logoutUser = asyncHandler(async (req, res) => {
   const id = req.user._id;
 
@@ -363,6 +367,9 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 
     if (!user) {
       throw new ApiError(404, "Login Expired...!");
+    }
+    if (user.isBanned) {
+      throw new ApiError(404, "User banned...!");
     }
 
     const { accessToken } = await genAccessAndRefreshToken(user._id);
@@ -422,18 +429,132 @@ export const changePassword = asyncHandler(async (req, res) => {
   }
 });
 
+export const emailVerify = asyncHandler(async (req, res) => {
+  const { code } = req.body;
+  const email = req.app.locals.EMAIL;
+  const saved_code = req.app.locals.OTP;
+
+  if (!saved_code) {
+    return res.status(400).json({
+      status: 400,
+      success: false,
+      message: "Unauthorized request.",
+    });
+  }
+
+  if (!code) {
+    return res
+      .status(400)
+      .json({ status: 400, success: false, message: "Please enter the code." });
+  }
+
+  try {
+    if (saved_code !== code) {
+      throw new ApiError(400, "Incorrect OTP.");
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { email },
+      { new: true }
+    )
+      .select("-password")
+      .populate("shippingAddress");
+
+    if (!user) {
+      throw new ApiError(400, "Update failed.");
+    }
+
+    const oldUser = await User.findById(req.user._id);
+    const options = {
+      to: email,
+      subject: "Your new email is confirmed.",
+      html: `<h1>${user.username}</h1><p>Your new email has been added.</p>`,
+    };
+    const oldOptions = {
+      to: oldUser.email,
+      subject: "Your email has been changed.",
+      html: `<h1>${user.username}</h1><p>Your new email (${email}) has been added.</p>`,
+    };
+
+    await sendEmail(options);
+    await sendEmail(oldOptions);
+
+    return res.status(200).json(
+      new ApiResponse(200, "User verified successfully.", user)
+    );
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      status: error.statusCode || 500,
+      success: false,
+      message: error.message || "An unexpected error occurred.",
+    });
+  } finally {
+    // Ensure OTP and EMAIL are cleared after the process
+    req.app.locals.OTP = null;
+    req.app.locals.EMAIL = null;
+  }
+});
+
+export const updateUserEmail = asyncHandler(async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      throw new ApiError(500, "Enter email...!");
+    }
+
+    const user = await User.findOne({_id: req.user._id})
+    if (!user) {
+      throw new ApiError(500, "User not found...!");
+    }
+    if (user.email === email) {
+      throw new ApiError(500, "Give new email...!");
+    }
+
+    const checkEmail = await User.findOne({email});
+    if (checkEmail) {
+      throw new ApiError(500, "This Email added in another acoount...!");
+    }
+
+    req.app.locals.EMAIL = email;
+    try {
+      const code = otpGenerator.generate(6, {
+        lowerCaseAlphabets: false,
+        upperCaseAlphabets: false,
+        specialChars: false,
+      });
+      req.app.locals.OTP = code;
+      const options = {
+        to: email,
+        subject: "Email verification code.",
+        html: `<h1>Hi ${user.username}</h1><br><p>Your email code here.</p><br><h1>CODE: ${code}</h1>`,
+      };
+      await sendEmail(options);
+    } catch (error) {
+      console.log(error)
+      throw new ApiError(500, "Faild to send mail..!");
+    }
+
+    return res.status(200).json(new ApiResponse(200, "updated user...", email));
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      status: error.statusCode,
+      success: false,
+      message: error.message,
+    });
+  }
+});
 export const updateUserInfo = asyncHandler(async (req, res) => {
   try {
-    const { fullName, email } = req.body;
-    if (!email && !fullName) {
-      throw new ApiError(500, "Nothing to update...!");
+    const { fullName } = req.body;
+    if (!fullName) {
+      throw new ApiError(500, "Enter Full-Name...!");
     }
 
     const user = await User.findOneAndUpdate(
       { _id: req.user._id },
       {
         $set: {
-          email,
           fullName,
         },
       },
@@ -476,39 +597,40 @@ export const avatarUpdate = asyncHandler(async (req, res) => {
     if (!avatarPath) {
       throw new ApiError(400, "Avatar missing..!");
     }
+
+    // Upload to Cloudinary
     const avatarImg = await uploadOnCloudinary(
       avatarPath,
       `Users_images/${req.user.username}`,
       "avatar"
     );
     if (!avatarImg) {
-      throw new ApiError(400, "Avatar saving faild");
+      throw new ApiError(400, "Avatar saving failed");
     }
-    const avatarUrlSqureArry = avatarImg.url.split("/");
-    const getFolder = avatarUrlSqureArry[avatarUrlSqureArry.length - 2];
-    const getImgId = avatarUrlSqureArry[avatarUrlSqureArry.length - 4];
-    const getImgName = avatarUrlSqureArry[avatarUrlSqureArry.length - 1];
-    const getIdName = `${getImgId}/Users_images/${getFolder}/${getImgName}`;
-    const avatarSqureUrl =
-      "https://res.cloudinary.com/dhw3jdygg/image/upload/w_1000,ar_1:1,c_fill/" +
-      getIdName;
 
+    // Extract parts of the Cloudinary URL for the formatted URL
+    const urlParts = avatarImg.url.split("/");
+    const folderName = urlParts[urlParts.length - 2];
+    const accountID = urlParts[urlParts.length - 4];
+    const fileName = urlParts[urlParts.length - 1];
+    const cloudinaryPath = `${accountID}/Users_images/${folderName}/${fileName}`;
+
+    // Construct square avatar URL with transformation
+    const avatarSquareUrl = `https://res.cloudinary.com/dhw3jdygg/image/upload/w_1000,ar_1:1,c_fill/${cloudinaryPath}`;
+
+    // Update user avatar in the database
     const user = await User.findByIdAndUpdate(
       req.user?._id,
-      {
-        $set: {
-          avatar: avatarSqureUrl,
-        },
-      },
+      { $set: { avatar: avatarSquareUrl } },
       { new: true }
     ).select("-password");
 
     return res.status(200).json(new ApiResponse(200, "Avatar updated", user));
   } catch (error) {
     return res.status(error.statusCode || 500).json({
-      status: error.statusCode,
+      status: error.statusCode || 500,
       success: false,
-      message: error.message,
+      message: error.message || "Internal Server Error",
     });
   }
 });
@@ -626,6 +748,60 @@ export const findUsersBySearch = asyncHandler(async (req, res) => {
     return res
       .status(200)
       .json(new ApiResponse(200, "User returned..!", users));
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      status: error.statusCode,
+      success: false,
+      message: error.message,
+    });
+  }
+});
+export const getMenu = asyncHandler(async (req, res) => {
+  try {
+    function capitalizeWords(str) {
+      return str
+        .split(" ")
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join(" ");
+    }
+
+    const genders = await Gender.find();
+
+    const menu = {
+      categories: await Promise.all(
+        genders.map(async (gender) => {
+          const categories = await Category.find({ gender: gender._id });
+          return {
+            id: gender.name.toLowerCase(),
+            name: capitalizeWords(gender.name),
+            sections: await Promise.all(
+              categories.map(async (category) => {
+                const subcategories = await SubCategory.find({
+                  category: category._id,
+                });
+                return {
+                  id: category.name.toLowerCase(),
+                  name: capitalizeWords(category.name),
+                  items: subcategories.map((sub) => ({
+                    name: capitalizeWords(sub.name),
+                    to: sub.value,
+                  })),
+                };
+              })
+            ),
+          };
+        })
+      ),
+      pages: [
+        { name: "Products", to: "products" },
+        { name: "Posts", to: "posts" },
+        { name: "About", to: "about" },
+      ],
+    };
+
+    return res.status(200).json(new ApiResponse(200, "Menu returned!", menu));
   } catch (error) {
     return res.status(error.statusCode || 500).json({
       status: error.statusCode,

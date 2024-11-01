@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import {
   Dialog,
   DialogBackdrop,
@@ -29,6 +29,8 @@ import { setCartOpen, setCurrency } from "../../store/usersSlice";
 import Cart from "../../pages/customer/Cart";
 import { Toaster } from "react-hot-toast";
 import axios from "axios";
+import SearchProduct from "../../components/SearchProduct";
+import { logout } from "../../store/authSlice";
 
 const navigation = {
   categories: [
@@ -162,7 +164,9 @@ function NavBar() {
   const { cartList, currency } = useSelector((state) => state?.Users);
   const { isLoggedIn, user } = useSelector((state) => state.auth);
   const [open, setOpen] = useState(false);
-  React.useEffect(() => {
+  const [navigation, setNavigation] = useState([]);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  useEffect(() => {
     if(isLoggedIn === true){
       const checkLocalCookie = async() => {
         const cookies = document.cookie.split('; ');
@@ -175,6 +179,7 @@ function NavBar() {
             await axios.post('/user/refresh-token', {refreshToken: user.refreshToken});
           } catch (error) {
             console.log(error)
+            dispatch(logout())
           }
         }
       };
@@ -183,6 +188,19 @@ function NavBar() {
     }
     return
   });
+
+  useEffect(() => {
+    async function fetch() {
+      try {
+        const res = await axios.get('/user/menu');
+        setNavigation(res.data.data)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetch()
+  }, [])
+  
 
   return (
     <div className="bg-white dark:bg-gray-900">
@@ -219,7 +237,7 @@ function NavBar() {
             <TabGroup className="mt-2">
               <div className="border-b border-gray-200 dark:border-gray-700">
                 <TabList className="-mb-px flex space-x-8 px-4">
-                  {navigation.categories.map((category) => (
+                  {navigation?.categories?.map((category) => (
                     <Tab
                       key={category.name}
                       className="flex-1 whitespace-nowrap border-b-2 border-transparent px-1 py-4 text-base font-medium text-gray-900 dark:text-gray-100 data-[selected]:border-indigo-600 data-[selected]:text-indigo-600"
@@ -230,13 +248,13 @@ function NavBar() {
                 </TabList>
               </div>
               <TabPanels as={Fragment}>
-                {navigation.categories.map((category) => (
+                {navigation?.categories?.map((category) => (
                   <TabPanel
                     key={category.name}
                     className="space-y-10 px-4 pb-8 pt-10"
                   >
-                    <div className="grid grid-cols-2 gap-x-4">
-                      {category.featured.map((item) => (
+                    {/* <div className="grid grid-cols-2 gap-x-4">
+                      {category.featured?.map((item) => (
                         <div key={item.name} className="group relative text-sm">
                           <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700 group-hover:opacity-75 custom-scrollbar">
                             <img
@@ -264,8 +282,8 @@ function NavBar() {
                           </p>
                         </div>
                       ))}
-                    </div>
-                    {category.sections.map((section) => (
+                    </div> */}
+                    {category.sections?.map((section) => (
                       <div key={section.name}>
                         <p
                           id={`${category.id}-${section.id}-heading-mobile`}
@@ -277,7 +295,7 @@ function NavBar() {
                           aria-labelledby={`${category.id}-${section.id}-heading-mobile`}
                           className="mt-6 flex flex-col space-y-6"
                         >
-                          {section.items.map((item) => (
+                          {section.items?.map((item) => (
                             <li key={item.name} className="flow-root">
                               <NavLink
                                 onClick={() => setOpen(false)}
@@ -297,7 +315,7 @@ function NavBar() {
             </TabGroup>
 
             <div className="space-y-6 border-t border-gray-200 dark:border-gray-700 px-4 py-6">
-              {navigation.pages.map((page) => (
+              {navigation?.pages?.map((page) => (
                 <div key={page.name} className="flow-root">
                   <NavLink
                     onClick={() => setOpen(false)}
@@ -340,7 +358,7 @@ function NavBar() {
                   onChange={(e) => dispatch(setCurrency(e.target.value))}
                   className="block md:hidden text-base focus:outline-none border-none dark:bg-slate-800 font-medium"
                 >
-                  {currencies.map((currency) => (
+                  {currencies?.map((currency) => (
                     <option key={currency} className="flex" value={currency}>
                       {currency}
                     </option>
@@ -373,8 +391,8 @@ function NavBar() {
                   <span className="sr-only">Your Company</span>
                   <img
                     alt=""
-                    src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
-                    className="h-8 w-auto"
+                    src={"/logo.png"}
+                    className="h-6 w-auto"
                   />
                 </Link>
               </div>
@@ -382,7 +400,7 @@ function NavBar() {
               {/* Flyout menus */}
               <PopoverGroup className="hidden lg:ml-8 lg:block lg:self-stretch">
                 <div className="flex h-full space-x-8">
-                  {navigation.categories.map((category) => (
+                  {navigation?.categories?.map((category) => (
                     <Popover key={category.name} className="flex">
                       <div className="relative flex">
                         <PopoverButton className="relative z-10 -mb-px flex items-center border-b-2 border-transparent pt-px text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200 ease-out hover:text-gray-800 dark:hover:text-gray-200 data-[open]:border-indigo-600 data-[open]:text-indigo-600">
@@ -402,8 +420,8 @@ function NavBar() {
                         <div className="relative bg-white dark:bg-gray-800">
                           <div className="mx-auto max-w-7xl px-8">
                             <div className="grid grid-cols-2 gap-x-8 gap-y-10 py-16">
-                              <div className="col-start-2 grid grid-cols-2 gap-x-8">
-                                {category.featured.map((item) => (
+                              {/* <div className="col-start-2 grid grid-cols-2 gap-x-8">
+                                {category.featured?.map((item) => (
                                   <div
                                     key={item.name}
                                     className="group relative text-base sm:text-sm"
@@ -433,9 +451,9 @@ function NavBar() {
                                     </p>
                                   </div>
                                 ))}
-                              </div>
+                              </div> */}
                               <div className="row-start-1 grid grid-cols-3 gap-x-8 gap-y-10 text-sm">
-                                {category.sections.map((section) => (
+                                {category.sections?.map((section) => (
                                   <div key={section.name}>
                                     <p
                                       id={`${section.name}-heading`}
@@ -447,7 +465,7 @@ function NavBar() {
                                       aria-labelledby={`${section.name}-heading`}
                                       className="mt-6 space-y-6 sm:mt-4 sm:space-y-4"
                                     >
-                                      {section.items.map((item) => (
+                                      {section.items?.map((item) => (
                                         <li key={item.name} className="flex">
                                           <NavLink
                                             onClick={() => setOpen(false)}
@@ -469,7 +487,7 @@ function NavBar() {
                     </Popover>
                   ))}
 
-                  {navigation.pages.map((page) => (
+                  {navigation?.pages?.map((page) => (
                     <NavLink
                       key={page.name}
                       to={page.to}
@@ -512,7 +530,7 @@ function NavBar() {
                       onChange={(e) => dispatch(setCurrency(e.target.value))}
                       className="ml-3 block text-base focus:outline-none border-none dark:bg-slate-800 font-medium"
                     >
-                      {currencies.map((currency) => (
+                      {currencies?.map((currency) => (
                         <option
                           key={currency}
                           className="flex"
@@ -528,13 +546,14 @@ function NavBar() {
 
                 {/* Search */}
                 <div className="flex lg:ml-6">
-                  <Link className="p-2 text-gray-400 hover:text-gray-500 dark:text-gray-400 dark:hover:text-gray-300">
+                  <div onClick={()=>setIsPopupOpen(!isPopupOpen)} className="p-2 text-gray-400 hover:text-gray-500 dark:text-gray-400 dark:hover:text-gray-300">
                     <span className="sr-only">Search</span>
                     <MagnifyingGlassIcon
                       aria-hidden="true"
                       className="h-6 w-6"
                     />
-                  </Link>
+                  </div>
+                  <SearchProduct isPopupOpen={isPopupOpen} setIsPopupOpen={setIsPopupOpen}/>
                 </div>
 
                 {/* Cart */}

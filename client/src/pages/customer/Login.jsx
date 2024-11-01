@@ -140,7 +140,7 @@ function Login() {
                 </div>
                 <Link
                   to={"/forget-password"}
-                  className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500"
+                  className="text-sm text-gray-800 dark:text-gray-300 font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Forgot password?
                 </Link>

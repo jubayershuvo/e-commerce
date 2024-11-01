@@ -31,7 +31,7 @@ function ForgetPassword() {
           const loadingToast = toast.loading('Finding user...!')
         try {
           // Send POST request to API endpoint
-          await axios.post('http://localhost:8080/api/v1/users/forget-password', {
+          await axios.post('/user/forget-password', {
             request:request,
           }, {
             withCredentials: true  // Ensure cookies are included in the request
@@ -60,7 +60,7 @@ function ForgetPassword() {
                       <label htmlFor="request" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Enter email or username</label>
                       <input type="text" name="code" value={request} onChange={handleChange} id="request" className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Email or username.....!" required=""/>
                   </div>
-                  <button type="submit" className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Send</button>
+                  <button type="submit" className="w-full bg-blue-600 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Send</button>
                 </form>
               </div>
             </div>

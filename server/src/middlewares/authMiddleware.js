@@ -49,7 +49,7 @@ export const isBanned = asyncHandler(async (req, res, next) => {
     }
 
     if (user.isBanned) {
-      throw new ApiError(401, "Account banned...!");
+      return res.clearCookie("accessToken").clearCookie("adminVerify")
     }
 
     next(); // Proceed to the next middleware

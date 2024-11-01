@@ -4,10 +4,12 @@ import {
   changePassword,
   currentUser,
   deleteUser,
+  emailVerify,
   findUserByUsername,
   findUsers,
   findUsersBySearch,
   forgetCodeVerify,
+  getMenu,
   loginUser,
   logoutUser,
   passwordRecovery,
@@ -15,6 +17,7 @@ import {
   registerUser,
   registerVerify,
   setPassword,
+  updateUserEmail,
   updateUserInfo,
 } from "../controllers/userController.js";
 import { verifyJWT } from "../middlewares/authMiddleware.js";
@@ -32,6 +35,8 @@ userRouter.route("/set-password").post(setPassword);
 userRouter.route("/login").post(loginUser);
 userRouter.route("/logout").get(verifyJWT, logoutUser);
 userRouter.route("/refresh-token").post(refreshAccessToken);
+userRouter.route("/update-email").post(verifyJWT, updateUserEmail);
+userRouter.route("/email-verify").post(verifyJWT, emailVerify);
 userRouter.route("/update-password").post(verifyJWT, changePassword);
 userRouter.route("/current-user").get(verifyJWT, currentUser);
 userRouter.route("/update-user").patch(verifyJWT, updateUserInfo);
@@ -41,5 +46,6 @@ userRouter.route("/all").get(findUsers);
 userRouter.route("/search-users").get(verifyJWT, findUsersBySearch);
 userRouter.route("/search-users").get(verifyJWT, findUsersBySearch);
 userRouter.route("/delete-user").post(verifyJWT, deleteUser);
+userRouter.route("/menu").get(getMenu);
 
 export default userRouter;

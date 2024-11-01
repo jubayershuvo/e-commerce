@@ -2,11 +2,12 @@ import { Router } from "express";
 import {
   addProduct,
   deleteProduct,
+  updateProduct,
 } from "../controllers/productController.js";
 import { upload } from "../middlewares/multerMiddleware.js";
 import { banUser, loginAdmin, makeAdmin, refreshAccessToken, removeAdmin, unbanUser } from "../controllers/adminController.js";
 import { verifyAdminJWT } from "../middlewares/adminMiddleware.js";
-import { allOrders, confirmedOrders, pendingOrders, singleOrder, updateStatus, withoutP } from "../controllers/orderController.js";
+import { addCoupon, allOrders, confirmedOrders, deleteCoupon, getAllCoupon, pendingOrders, singleOrder, updateStatus, withoutP } from "../controllers/orderController.js";
 
 const adminRouter = Router();
 
@@ -26,7 +27,18 @@ adminRouter.route("/product/add").post(
   ]),
   addProduct
 );
+adminRouter.route("/product/update/:_id").post(
+  verifyAdminJWT,
+  upload.fields([
+    { name: "productImage", maxCount: 1 }, // Single file for productImage
+    { name: "images", maxCount: 5 }, // Multiple files for images
+  ]),
+  updateProduct
+);
 adminRouter.route("/product/delete").post(verifyAdminJWT, deleteProduct);
+adminRouter.route("/coupon/add").post(verifyAdminJWT, addCoupon);
+adminRouter.route("/coupon/all").get(verifyAdminJWT, getAllCoupon);
+adminRouter.route("/coupon/delete/:_id").get(verifyAdminJWT, deleteCoupon);
 
 // for admin
 adminRouter.route("/order/all").get(verifyAdminJWT, allOrders);

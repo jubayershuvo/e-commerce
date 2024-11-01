@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import LogoutBtn from './LogoutBtn';
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import LogoutBtn from "./LogoutBtn";
 
 const MiniProfile = () => {
-  const navigate = useNavigate();
-  const {user} = useSelector(state => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
@@ -29,29 +28,25 @@ const MiniProfile = () => {
           className="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-2 z-50"
           onClick={(e) => e.stopPropagation()}
         >
-          <button
+          <Link
+            to={"/profile"}
             className="block w-full text-left px-4 pb-1 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
             onClick={() => {
-              alert('Navigate to profile')
-              setIsOpen(false)
-
+              setIsOpen(false);
             }}
           >
             My Profile
-          </button>
+          </Link>
           <hr className="opacity-55" />
-          <button
+          <Link
+            to={"/myorders"}
             className="block w-full text-left px-4 py-1 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-            onClick={() => {
-              navigate('/myorders')
-              setIsOpen(false)
-            }}
           >
             My Orders
-          </button>
+          </Link>
           <hr className="opacity-55" />
-          <button className='block w-full text-left px-4 pt-2 '>
-            <LogoutBtn/>
+          <button className="block w-full text-left px-4 pt-2 ">
+            <LogoutBtn />
           </button>
         </div>
       )}

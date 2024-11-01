@@ -52,6 +52,7 @@ const PaymentDetails = ({ payment, close }) => {
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full overflow-hidden">
         <h2 className="text-xl font-bold">Payment Details</h2>
         <p className="mt-2 text-sm md:text-base break-words">Payment ID: {payment.paymentID}</p>
+        <p className="mt-2 text-sm md:text-base break-words">Order ID: {payment.order}</p>
         <p className="mt-2 text-sm md:text-base break-words">Amount: {payment.amount} {payment.currency}</p>
         <p className="mt-2 text-sm md:text-base break-words">Status: {payment.status}</p>
         <p className="mt-2 text-sm md:text-base break-words">Transaction ID: {payment.trxID}</p>

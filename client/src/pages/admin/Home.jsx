@@ -65,7 +65,7 @@ const Dashboard = () => {
             <div className="flex items-center">
               <ClockIcon className="h-10 w-10 text-blue-500" />
               <div className="ml-3">
-                <h3 className="text-lg font-semibold">Pending Products</h3>
+                <h3 className="text-lg font-semibold">Pending Orders</h3>
                 <p className="text-xl font-bold">{pendingOrders.length}</p>
               </div>
             </div>

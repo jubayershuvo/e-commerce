@@ -9,14 +9,17 @@ const productSchema = new Schema(
     gender: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Gender",
+      required: true,
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
+      required: true,
     },
     subCategory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "SubCategory",
+      required: true,
     },
     totalOrder: {
       type: Number,

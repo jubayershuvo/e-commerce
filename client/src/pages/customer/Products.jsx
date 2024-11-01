@@ -27,48 +27,11 @@ import ProductCard from "../customer/ProductCard";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 const sortOptions = [
-  { name: "Most Popular", to: "#", current: true },
+  { name: "Most Popular", to: "popular", current: true },
   { name: "Best Rating", to: "#", current: false },
   { name: "Newest", to: "#", current: false },
   { name: "Price: Low to High", to: "#", current: false },
   { name: "Price: High to Low", to: "#", current: false },
-];
-const filters = [
-  {
-    id: "color",
-    name: "Color",
-    options: [
-      { value: "white", label: "White", checked: false },
-      { value: "beige", label: "Beige", checked: false },
-      { value: "blue", label: "Blue", checked: false },
-      { value: "brown", label: "Brown", checked: false },
-      { value: "green", label: "Green", checked: false },
-      { value: "purple", label: "Purple", checked: false },
-    ],
-  },
-  {
-    id: "category",
-    name: "Category",
-    options: [
-      { value: "new-arrivals", label: "New Arrivals", checked: false },
-      { value: "sale", label: "Sale", checked: false },
-      { value: "travel", label: "Travel", checked: false },
-      { value: "organization", label: "Organization", checked: false },
-      { value: "accessories", label: "Accessories", checked: false },
-    ],
-  },
-  {
-    id: "size",
-    name: "Size",
-    options: [
-      { value: "2l", label: "2L", checked: false },
-      { value: "6l", label: "6L", checked: false },
-      { value: "12l", label: "12L", checked: false },
-      { value: "18l", label: "18L", checked: false },
-      { value: "20l", label: "20L", checked: false },
-      { value: "40l", label: "40L", checked: false },
-    ],
-  },
 ];
 
 function classNames(...classes) {
@@ -79,8 +42,6 @@ export default function Products() {
   const location = useLocation();
   const navigate = useNavigate();
   const { genderID, categoryID, subcategoryID } = useParams();
-
-  console.log(genderID, categoryID, subcategoryID)
 
   const handleFilters = (id, value) => {
     const searchParams = new URLSearchParams(location.search);
@@ -106,6 +67,18 @@ export default function Products() {
   };
 
   const [products, setProducts] = useState([]);
+  const [filters, setFilters] = useState([
+    {
+      id: "size",
+      name: "Size",
+      options: [],
+    },
+    {
+      id: "color",
+      name: "Colour",
+      options: [],
+    },
+  ]);
 
   useEffect(() => {
     async function fetch() {
@@ -131,6 +104,23 @@ export default function Products() {
   }, [genderID, categoryID, subcategoryID]);
 
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  useEffect(() => {
+    const uniqueSizes = [
+      ...new Set(products.flatMap((product) => product.availableSize)),
+    ];
+
+    const formattedSizes = uniqueSizes.map((size) => ({
+      label: size,
+      value: size,
+    }));
+
+    setFilters((prevFilters) =>
+      prevFilters.map((filter) =>
+        filter.id === "size" ? { ...filter, options: formattedSizes } : filter
+      )
+    );
+  }, [products]);
 
   return (
     <div className="bg-white dark:bg-gray-800 custom-scrollbar">
@@ -167,7 +157,7 @@ export default function Products() {
 
               {/* Filters */}
               <form className="mt-4 border-t border-gray-200 dark:border-gray-700 custom-scrollbar">
-                {filters.map((section) => (
+                {filters?.map((section) => (
                   <Disclosure
                     key={section.id}
                     as="div"
@@ -225,7 +215,7 @@ export default function Products() {
         <main className="mx-auto px-4 sm:px-6 lg:px-8 custom-scrollbar">
           <div className="flex items-baseline justify-between border-b border-gray-200 dark:border-gray-700 pb-6 pt-24">
             <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
-              New Arrivals
+              Products
             </h1>
 
             <div className="flex items-center">
@@ -297,7 +287,7 @@ export default function Products() {
             <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4 min-w-7xl lg:max-h-screen">
               {/* Filters */}
               <form className="hidden lg:block">
-                {filters.map((section) => (
+                {filters?.map((section) => (
                   <Disclosure
                     key={section.id}
                     as="div"

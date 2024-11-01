@@ -40,7 +40,7 @@ const PaymentDetailsPage = () => {
       </div>
     );
   }
-
+const date = new Date(payment.createdAt)
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-10">
       <div className="container mx-auto p-4 max-w-2xl">
@@ -55,7 +55,7 @@ const PaymentDetailsPage = () => {
               <strong>Order ID:</strong> {payment.order}
             </p>
             <p className="break-words">
-              <strong>User ID:</strong> {payment.user}
+              <strong>User ID:</strong> {payment.user._id}
             </p>
             <p className="break-words">
               <strong>Amount:</strong> {payment.amount} {payment?.currency}
@@ -64,7 +64,7 @@ const PaymentDetailsPage = () => {
               <strong>Status:</strong> {payment.status}
             </p>
             <p className="break-words">
-              <strong>Date:</strong> {payment.date}
+              <strong>Date:</strong> {date.toLocaleString()}
             </p>
             <p className="break-words">
               <strong>Transaction ID (TrxID):</strong> {payment.trxID}

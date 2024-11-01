@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import NavBar from "./layouts/customer/NavBar";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/customer/Home";
@@ -29,6 +29,10 @@ import PaymentInfo from "./pages/customer/PaymentInfo.jsx";
 import PaymentList from "./pages/admin/PaymentList.jsx";
 import PaymentDetails from "./pages/admin/PaymentDetails.jsx";
 import AdminLogin from "./pages/admin/AdminLogin.jsx";
+import CategoryPage from "./pages/admin/ManageCategory.jsx";
+import CouponManager from "./pages/admin/CouponManager.jsx";
+import UpdateProfile from "./pages/customer/UpdateProfile.jsx";
+import VerifyEmail from "./components/VerifyEmail.jsx";
 
 function App() {
   return (
@@ -47,6 +51,7 @@ function App() {
 export default App;
 
 function UserRouter() {
+  
   return (
     <>
       <NavBar />
@@ -54,14 +59,16 @@ function UserRouter() {
         <Route path="/" element={<Home />} />
         <Route path="register" element={<Register />} />
         <Route path="activate" element={<Activate />} />
+        <Route path="email/verify" element={<VerifyEmail />} />
 
         <Route path="login" element={<Login />} />
+        <Route path="profile" element={<UpdateProfile />} />
 
         <Route path="products" element={<Products />} />
         <Route path="products/:genderID/:categoryID/:subcategoryID" element={<Products />} />
         <Route path="checkout" element={<CheckOut />} />
         <Route path="payment/:_id" element={<PaymentPage />} />
-        <Route path="paymentinfo" element={<PaymentInfo />} />
+        <Route path="paymentinfo/" element={<PaymentInfo />} />
         <Route path="product/:_id" element={<ProductPage />} />
         <Route path="myorders" element={<MyOrders />} />
         <Route path="order/:_id" element={<MyOrderDetails />} />
@@ -74,7 +81,7 @@ function UserRouter() {
         <Route path="set-password" element={<SetPassword />} />
 
         <Route path="change-password" element={<ChangePassword />} />
-        <Route path="test" element={<Test />} />
+        <Route path="test" element={<Test/>} />
       </Routes>
       <Footer />
     </>
@@ -93,6 +100,8 @@ function AdminRouter() {
           <Route path="orders" element={<OrderList />} />
           <Route path="payments" element={<PaymentList />} />
           <Route path="payment/:_id" element={<PaymentDetails />} />
+          <Route path="categories" element={<CategoryPage />} />
+          <Route path="coupons" element={<CouponManager />} />
         </Route>
         <Route path="login" element={<AdminLogin />} />
       </Routes>

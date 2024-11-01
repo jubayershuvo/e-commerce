@@ -23,6 +23,9 @@ export const addProduct = asyncHandler(async (req, res) => {
   } = req.body;
   const { productImage, images } = req.files;
   try {
+    if (!genderName || !categoryName || !subCategoryName) {
+      throw new ApiError(400, "Category section is required...!");
+    }
     if (!title) {
       throw new ApiError(400, "Title is required...!");
     }
@@ -35,15 +38,15 @@ export const addProduct = asyncHandler(async (req, res) => {
     if (!productImage) {
       throw new ApiError(400, "Product Image is required...!");
     }
-    const gender = await Gender.findOne({ name: genderName });
 
+    const gender = await Gender.findOne({ value: genderName });
     const category = await Category.findOne({
-      name: categoryName,
+      value: categoryName,
       gender: gender?._id,
     });
 
     const subCategory = await SubCategory.findOne({
-      name: subCategoryName,
+      value: subCategoryName,
       category: category?._id,
     });
     const product = await Product.create({
@@ -59,7 +62,7 @@ export const addProduct = asyncHandler(async (req, res) => {
     if (!product) {
       throw new ApiError(500, "Product save faild");
     }
-    const productImagePath = productImage[0].path;
+    const productImagePath = productImage[0]?.path;
     const uploaderProductImage = await uploadOnCloudinary(
       productImagePath,
       `Product_images/${product._id}`,
@@ -94,82 +97,6 @@ export const addProduct = asyncHandler(async (req, res) => {
         .status(201)
         .json(
           new ApiResponse(200, "Product added successfully....!", addedProduct)
-        );
-    } catch (error) {
-      return res.status(error.statusCode || 500).json({
-        status: error.statusCode,
-        success: false,
-        message: error.message,
-      });
-    }
-  } catch (error) {
-    return res.status(error.statusCode || 500).json({
-      status: error.statusCode,
-      success: false,
-      message: error.message,
-    });
-  }
-});
-
-export const updateProductInfo = asyncHandler(async (req, res) => {
-  try {
-    const { _id, title, description, regularPrice, discount, availableSize } =
-      req.body;
-    const { productImage, images } = req.files;
-
-    const product = await User.findOneAndUpdate(
-      _id,
-      {
-        title,
-        description,
-        regularPrice: Number(regularPrice),
-        discount: Number(discount),
-        availableSize: availableSize.split(","),
-      },
-      {
-        new: true,
-      }
-    );
-
-    if (!product) {
-      throw new ApiError(500, "Product save faild");
-    }
-    const productImagePath = productImage[0].path;
-    const uploaderProductImage = await uploadOnCloudinary(
-      productImagePath,
-      `Product_images/${product._id}`,
-      "ProductImage"
-    );
-    let productImages = []; // Initialize as an empty array
-    if (images?.length > 0) {
-      const uploadPromises = images.map(async (element, index) => {
-        const res = await uploadOnCloudinary(
-          element.path,
-          `Product_images/${product._id}`,
-          `ProductImage${index + 1}`
-        );
-        return res.secure_url; // Return the secure URL
-      });
-
-      // Wait for all uploads to complete
-      productImages = await Promise.all(uploadPromises);
-    }
-    try {
-      await Product.findByIdAndUpdate(
-        product._id,
-        {
-          $set: {
-            imageUrl: uploaderProductImage?.secure_url,
-            images: productImages,
-          },
-        },
-        { new: true }
-      );
-      const products = await Product.find().sort({ createdAt: -1 });
-      return res
-        .status(201)
-        .json(
-          new ApiResponse(200, "Product added successfully....!", products)
         );
     } catch (error) {
       return res.status(error.statusCode || 500).json({
@@ -244,7 +171,11 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 
 export const findProducts = asyncHandler(async (req, res) => {
   try {
-    const product = await Product.find().sort({ createdAt: -1 });
+    const product = await Product.find()
+      .populate("gender")
+      .populate("category")
+      .populate("subCategory")
+      .sort({ createdAt: -1 });
     if (!product) {
       throw new ApiError(400, "Products not found..!");
     }
@@ -265,21 +196,19 @@ export const findProductByCategory = asyncHandler(async (req, res) => {
     if (!genderName || !categoryName || !subCategoryName) {
       throw new ApiError(400, "Something is missing..!");
     }
-    const gender = await Gender.findOne({ name: genderName });
+    const gender = await Gender.findOne({ value: genderName });
 
     const category = await Category.findOne({
-      name: categoryName,
+      value: categoryName,
       gender: gender?._id,
     });
 
     const subCategory = await SubCategory.findOne({
-      name: subCategoryName,
+      value: subCategoryName,
       category: category?._id,
     });
 
     const products = await Product.find({
-      gender: gender?._id,
-      category: category?._id,
       subCategory: subCategory?._id,
     });
     if (!products) {
@@ -370,29 +299,135 @@ export const givReview = asyncHandler(async (req, res) => {
   }
 });
 
-export const findProdutsBySearch = asyncHandler(async (req, res) => {
+export const findProdutsByGender = asyncHandler(async (req, res) => {
   try {
-    const search = req.query.search;
+    const search = req.params.gender;
     if (!search) {
       throw new ApiError(400, "Enter something...!...!");
     }
+    const gender = await Gender.findOne({ value: search });
+
+    const products = await Product.find({ gender: gender._id });
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "User returned..!", products));
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      status: error.statusCode,
+      success: false,
+      message: error.message,
+    });
+  }
+});
+export const findProductsBySearch = asyncHandler(async (req, res) => {
+  try {
+    const { search } = req.params; // Access specific search parameter
+    if (!search) {
+      throw new ApiError(400, "Please enter a search term.");
+    }
+
     const keyword = search
       ? {
           $or: [
-            { fullName: { $regex: search, $options: "i" } }, // Case-insensitive match for fullName
-            { username: { $regex: search, $options: "i" } }, // Case-insensitive match for username
-            { email: { $regex: search, $options: "i" } }, // Case-insensitive match for email
+            { title: { $regex: search, $options: "i" } }, // Case-insensitive search for title
           ],
         }
       : {};
 
-    const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+    const products = await Product.find(keyword);
     return res
       .status(200)
-      .json(new ApiResponse(200, "User returned..!", users));
+      .json(new ApiResponse(200, "Products retrieved successfully.", products));
   } catch (error) {
     return res.status(error.statusCode || 500).json({
-      status: error.statusCode,
+      status: error.statusCode || 500,
+      success: false,
+      message: error.message || "Internal server error",
+    });
+  }
+});
+export const updateProduct = asyncHandler(async (req, res) => {
+  const {
+    genderName,
+    categoryName,
+    subCategoryName,
+    title,
+    description,
+    regularPrice,
+    discount,
+    availableSize,
+  } = req.body;
+  const { _id } = req.params;
+  const { productImage, images } = req.files;
+
+  try {
+    // Fetch gender, category, and subcategory
+    const gender = await Gender.findOne({ value: genderName });
+    const category = await Category.findOne({
+      value: categoryName,
+      gender: gender?._id,
+    });
+    const subCategory = await SubCategory.findOne({
+      value: subCategoryName,
+      category: category?._id,
+    });
+
+    // Fetch product to update
+    const product = await Product.findById(_id);
+    if (!product) {
+      throw new ApiError(404, "Product not found");
+    }
+
+    // Upload main product image if provided
+    let uploaderProductImage;
+    if (productImage && productImage[0]) {
+      const productImagePath = productImage[0].path;
+      uploaderProductImage = await uploadOnCloudinary(
+        productImagePath,
+        `Product_images/${product._id}`,
+        "ProductImage"
+      );
+    }
+
+    // Upload additional images if provided
+    let productImages = [];
+    if (images && images.length > 0) {
+      const uploadPromises = images.map((element, index) =>
+        uploadOnCloudinary(
+          element.path,
+          `Product_images/${product._id}`,
+          `ProductImage${index + 1}`
+        ).then((res) => res.secure_url)
+      );
+      productImages = await Promise.all(uploadPromises);
+    }
+
+    // Update product details
+    const updatedProduct = await Product.findByIdAndUpdate(
+      _id,
+      {
+        title,
+        description,
+        regularPrice: Number(regularPrice),
+        discount: Number(discount),
+        availableSize: availableSize.split(","),
+        gender: gender?._id,
+        category: category?._id,
+        subCategory: subCategory?._id,
+        productImage: uploaderProductImage?.secure_url || product.productImage, // Fallback to existing image if none is provided
+        images: productImages.length > 0 ? productImages : product.images, // Fallback to existing images if none are provided
+      },
+      { new: true }
+    );
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, "Product updated successfully!", updatedProduct)
+      );
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      status: error.statusCode || 500,
       success: false,
       message: error.message,
     });

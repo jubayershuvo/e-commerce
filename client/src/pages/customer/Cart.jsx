@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import axios from "axios"
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -61,11 +62,21 @@ export default function Cart() {
       }
     }
   }, [regularPrice, totalPrice, discountCupon, payableAmount, dispatch]);
-
-  const handleCupon = (e) => {
+const [couponLoading,setCouponLoading] = useState(false)
+  const handleCupon = async(e) => {
     e.preventDefault();
     if (discountedCuponPrice <= 0) {
-      dispatch(setDiscountCupon(cupon));
+      setCouponLoading(true)
+      try {
+        const res = await axios.get(`/order/coupon/${cupon}`)
+        dispatch(setDiscountCupon(res.data.data.discount));
+        setCouponLoading(false)
+      } catch (error) {
+        console.log(error)
+        setCouponLoading(false)
+      }
+
+      
     }
   };
   const handleCopy = (index) => {
@@ -262,6 +273,7 @@ export default function Cart() {
                   />
                   {discountCupon === 0 ? <button
                     onClick={handleCupon}
+                    disabled={couponLoading ? true:false}
                     className="col-span-3 disabled:opacity-50 row-span-1 text-sm py-2 md:text-base bg-blue-600 text-white dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   >
                     Apply Cupon

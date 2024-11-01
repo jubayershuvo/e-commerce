@@ -58,3 +58,7 @@
       -moz-appearance: textfield;
     }
   }
+
+  .active{
+    color: orange;
+  }

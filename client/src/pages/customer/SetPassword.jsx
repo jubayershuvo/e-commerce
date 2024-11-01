@@ -49,7 +49,7 @@ function SetPassword() {
           const loadingToast = toast.loading('Updating password..!')
         try {
           // Send POST request to API endpoint
-          await axios.post('http://localhost:8080/api/v1/users/set-password', {password});
+          await axios.post('/user/set-password', {password});
 
           toast.success('Password updated successfully!',{id: loadingToast}); 
           navigate('/login')
@@ -89,7 +89,7 @@ function SetPassword() {
                           </div>
                       </div>
                   </div>
-                  <button type="submit" className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Change</button>
+                  <button type="submit" className="w-full bg-blue-500 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Change</button>
               </form>
           </div>
       </div>

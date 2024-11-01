@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import MainCarousel from "../../components/MainCarousel";
 import ProductCarosel from "../../components/ProductCarousel";
-import axios from 'axios';
+import axios from "axios";
 
 function Home() {
-  const [products, setProducts] = useState([])
+  const [menProducts, setMenProducts] = useState([]);
+  const [womenProducts, setWomenProducts] = useState([]);
+
   const banners = [
     {
       title: "Banner 1",
@@ -36,30 +38,53 @@ function Home() {
     async function fetch() {
       try {
         // Submit the data if validation passed
-        const response = await axios.get("/product/all");
-  
+        const response = await axios.get("/product/gender/men");
+
         if (response?.data?.data) {
-           setProducts(response.data.data)
-        } 
+          setMenProducts(response.data.data);
+        }
       } catch (error) {
         console.log("Error during address submission: ", error);
       }
     }
-    fetch()
-  }, [])
+    fetch();
+  }, []);
+  useEffect(() => {
+    async function fetch() {
+      try {
+        // Submit the data if validation passed
+        const response = await axios.get("/product/gender/women");
+
+        if (response?.data?.data) {
+          setWomenProducts(response.data.data);
+        }
+      } catch (error) {
+        console.log("Error during address submission: ", error);
+      }
+    }
+    fetch();
+  }, []);
   return (
     <div className="bg-white custom-scrollbar dark:bg-gray-800 min-h-screen dark:text-white">
       <div className="pb-5 m-auto">
         <div className="mx-4">
           <MainCarousel banners={banners} />
         </div>
-        <div className="m-2">
-          <h1 className="ml-4 font-extrabold">It's Kurta</h1>
-          <ProductCarosel items={products} />
+        <div className="m-2 min-h-60">
+          <h1 className="ml-4 font-extrabold">For Men's</h1>
+          {menProducts.length > 0 ? (
+            <ProductCarosel items={menProducts} />
+          ) : (
+            <p className="mt-10 ml-10">No products</p>
+          )}
         </div>
         <div className="m-2">
-          <h1 className="ml-4 font-extrabold">It's Kurta</h1>
-          <ProductCarosel items={products} />
+          <h1 className="ml-4 font-extrabold">For Women's</h1>
+          {womenProducts.length > 0 ? (
+            <ProductCarosel items={womenProducts} />
+          ) : (
+            <p className="mt-10 ml-10">No products</p>
+          )}
         </div>
       </div>
     </div>

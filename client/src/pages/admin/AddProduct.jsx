@@ -97,16 +97,6 @@ const AddProduct = () => {
     try {
       const data = new FormData();
 
-      if (genderName) {
-        if (!categoryName) {
-          toast.error("Select category..!");
-          return;
-        } else if (!subCategoryName) {
-          toast.error("Select Sub-Category..!");
-          return;
-        }
-      }
-
       // Append all form fields to FormData
       data.append("title", formData.title);
       data.append("description", formData.description);
@@ -144,9 +134,10 @@ const AddProduct = () => {
       }
     } catch (error) {
       toast.error(error.response.data.message, { id: addProductLoading });
-      console.error("Error uploading images:", error);
     }
   };
+
+ 
 
   return (
     <div
@@ -176,9 +167,10 @@ const AddProduct = () => {
                 onChange={(e) => setGenderName(e.target.value)} // Update state on change
                 className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-indigo-400"
               >
-                <option value="">Select gender</option>
-
                 {/* Check if genders is not null/undefined and has values */}
+                <option value="">
+                      Select gender
+                    </option>
                 {genders?.length > 0 ? (
                   genders.map((gender) => (
                     <option key={gender.value} value={gender.value}>
@@ -207,7 +199,7 @@ const AddProduct = () => {
                 <option value="">Select Category</option>
                 {categories?.length > 0 ? (
                   categories.map((category) => (
-                    <option key={category._id} value={category.name}>
+                    <option key={category._id} value={category.value}>
                       {category.name}
                     </option>
                   ))
@@ -234,7 +226,7 @@ const AddProduct = () => {
                 <option value="">Select Sub-Category</option>
                 {subCategories?.length > 0 ? (
                   subCategories.map((subCategory) => (
-                    <option key={subCategory._id} value={subCategory.name}>
+                    <option key={subCategory._id} value={subCategory.value}>
                       {subCategory.name}
                     </option>
                   ))
