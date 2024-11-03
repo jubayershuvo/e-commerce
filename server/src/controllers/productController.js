@@ -22,6 +22,7 @@ export const addProduct = asyncHandler(async (req, res) => {
     availableSize,
   } = req.body;
   const { productImage, images } = req.files;
+
   try {
     if (!genderName || !categoryName || !subCategoryName) {
       throw new ApiError(400, "Category section is required...!");
@@ -35,7 +36,8 @@ export const addProduct = asyncHandler(async (req, res) => {
     if (!regularPrice) {
       throw new ApiError(400, "Price is required...!");
     }
-    if (!productImage) {
+    const productImagePath = productImage[0]?.path; // Assuming productImage is an array
+    if (!productImagePath) {
       throw new ApiError(400, "Product Image is required...!");
     }
 
@@ -49,6 +51,7 @@ export const addProduct = asyncHandler(async (req, res) => {
       value: subCategoryName,
       category: category?._id,
     });
+
     const product = await Product.create({
       title,
       description,
@@ -59,57 +62,59 @@ export const addProduct = asyncHandler(async (req, res) => {
       category: category?._id,
       subCategory: subCategory?._id,
     });
+
     if (!product) {
-      throw new ApiError(500, "Product save faild");
+      throw new ApiError(500, "Product save failed");
     }
-    const productImagePath = productImage[0]?.path;
+
     const uploaderProductImage = await uploadOnCloudinary(
       productImagePath,
       `Product_images/${product._id}`,
       "ProductImage"
     );
+
+    const urlParts = uploaderProductImage.url.split("/");
+    const folderName = urlParts[urlParts.length - 2];
+    const accountID = urlParts[urlParts.length - 4];
+    const fileName = urlParts[urlParts.length - 1];
+    const cloudinaryPath = `${accountID}/Product_images/${folderName}/${fileName}`;
+
+    const productSquareUrl = `https://res.cloudinary.com/dhw3jdygg/image/upload/w_1000,ar_1:1,c_fill/${cloudinaryPath}`;
+
     let productImages = []; // Initialize as an empty array
     if (images?.length > 0) {
-      const uploadPromises = images.map(async (element, index) => {
-        const res = await uploadOnCloudinary(
+      const uploadPromises = images.map((element, index) =>
+        uploadOnCloudinary(
           element.path,
           `Product_images/${product._id}`,
           `ProductImage${index + 1}`
-        );
-        return res.secure_url; // Return the secure URL
-      });
+        )
+      );
 
-      // Wait for all uploads to complete
       productImages = await Promise.all(uploadPromises);
     }
-    try {
-      const addedProduct = await Product.findByIdAndUpdate(
-        product._id,
-        {
-          $set: {
-            imageUrl: uploaderProductImage?.secure_url,
-            images: productImages,
-          },
+
+    const addedProduct = await Product.findByIdAndUpdate(
+      product._id,
+      {
+        $set: {
+          imageUrl: productSquareUrl,
+          images: productImages,
         },
-        { new: true }
+      },
+      { new: true }
+    );
+
+    return res
+      .status(201)
+      .json(
+        new ApiResponse(200, "Product added successfully....!", addedProduct)
       );
-      return res
-        .status(201)
-        .json(
-          new ApiResponse(200, "Product added successfully....!", addedProduct)
-        );
-    } catch (error) {
-      return res.status(error.statusCode || 500).json({
-        status: error.statusCode,
-        success: false,
-        message: error.message,
-      });
-    }
   } catch (error) {
     return res.status(error.statusCode || 500).json({
       status: error.statusCode,
       success: false,
-      message: error.message,
+      message: error.message || "An error occurred while adding the product.",
     });
   }
 });
@@ -210,7 +215,7 @@ export const findProductByCategory = asyncHandler(async (req, res) => {
 
     const products = await Product.find({
       subCategory: subCategory?._id,
-    });
+    }).sort({ createdAt: -1 });
     if (!products) {
       throw new ApiError(400, "Products not found..!");
     }
@@ -307,7 +312,9 @@ export const findProdutsByGender = asyncHandler(async (req, res) => {
     }
     const gender = await Gender.findOne({ value: search });
 
-    const products = await Product.find({ gender: gender._id });
+    const products = await Product.find({ gender: gender._id }).sort({
+      createdAt: -1,
+    });
     return res
       .status(200)
       .json(new ApiResponse(200, "User returned..!", products));
@@ -316,6 +323,33 @@ export const findProdutsByGender = asyncHandler(async (req, res) => {
       status: error.statusCode,
       success: false,
       message: error.message,
+    });
+  }
+});
+export const findProductsBySubCategory = asyncHandler(async (req, res) => {
+  try {
+    const { subCategory } = req.params; // Access specific search parameter
+    if (!subCategory) {
+      throw new ApiError(400, "Please enter a subCategory.");
+    }
+
+    const products = await Product.find({ subCategory: subCategory }).sort({
+      createdAt: -1,
+    });
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          "Products retrieved successfully.",
+          products.slice(0, 5)
+        )
+      );
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      status: error.statusCode || 500,
+      success: false,
+      message: error.message || "Internal server error",
     });
   }
 });
@@ -356,6 +390,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
     regularPrice,
     discount,
     availableSize,
+    inStock
   } = req.body;
   const { _id } = req.params;
   const { productImage, images } = req.files;
@@ -379,14 +414,21 @@ export const updateProduct = asyncHandler(async (req, res) => {
     }
 
     // Upload main product image if provided
-    let uploaderProductImage;
+    let productSquareUrl;
     if (productImage && productImage[0]) {
       const productImagePath = productImage[0].path;
-      uploaderProductImage = await uploadOnCloudinary(
+      const uploded = await uploadOnCloudinary(
         productImagePath,
         `Product_images/${product._id}`,
         "ProductImage"
       );
+      const urlParts = uploded?.url.split("/");
+      const folderName = urlParts[urlParts?.length - 2];
+      const accountID = urlParts[urlParts?.length - 4];
+      const fileName = urlParts[urlParts?.length - 1];
+      const cloudinaryPath = `${accountID}/Product_images/${folderName}/${fileName}`;
+
+      productSquareUrl = `https://res.cloudinary.com/dhw3jdygg/image/upload/w_1000,ar_1:1,c_fill/${cloudinaryPath}`;
     }
 
     // Upload additional images if provided
@@ -403,7 +445,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
     }
 
     // Update product details
-    const updatedProduct = await Product.findByIdAndUpdate(
+    await Product.findByIdAndUpdate(
       _id,
       {
         title,
@@ -414,17 +456,18 @@ export const updateProduct = asyncHandler(async (req, res) => {
         gender: gender?._id,
         category: category?._id,
         subCategory: subCategory?._id,
-        productImage: uploaderProductImage?.secure_url || product.productImage, // Fallback to existing image if none is provided
+        imageUrl: productSquareUrl, // Fallback to existing image if none is provided
         images: productImages.length > 0 ? productImages : product.images, // Fallback to existing images if none are provided
+        inStock
       },
       { new: true }
     );
 
+    const products = await Product.find().sort({ updatedAt: -1 });
+
     return res
       .status(200)
-      .json(
-        new ApiResponse(200, "Product updated successfully!", updatedProduct)
-      );
+      .json(new ApiResponse(200, "Product updated successfully!", products));
   } catch (error) {
     return res.status(error.statusCode || 500).json({
       status: error.statusCode || 500,

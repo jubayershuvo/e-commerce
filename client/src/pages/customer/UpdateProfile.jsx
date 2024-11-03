@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../store/authSlice";
@@ -257,7 +257,7 @@ function UpdateProfile() {
               />
               <label
                 htmlFor="checkbox"
-                className="text-gray-700 font-medium cursor-pointer"
+                className="text-gray-700 dark:text-gray-400 font-medium cursor-pointer"
               >
                 Show password
               </label>
@@ -271,6 +271,17 @@ function UpdateProfile() {
             >
               Change password
             </button>
+          </div>
+          
+          <div className="text-center justify-between w-full mb-4">
+            <h1 className="w-full block my-2">Or</h1>
+            <Link
+            to={'/account-delete'}
+              className="bg-red-500 hover:bg-red-700 text-white m-auto font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              
+            >
+              Delete account
+            </Link>
           </div>
         </div>
       </div>

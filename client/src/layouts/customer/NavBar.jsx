@@ -27,7 +27,7 @@ import MiniProfile from "../../components/MiniProfile";
 import { useDispatch, useSelector } from "react-redux";
 import { setCartOpen, setCurrency } from "../../store/usersSlice";
 import Cart from "../../pages/customer/Cart";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import SearchProduct from "../../components/SearchProduct";
 import { logout } from "../../store/authSlice";
@@ -178,7 +178,7 @@ function NavBar() {
           try {
             await axios.post('/user/refresh-token', {refreshToken: user.refreshToken});
           } catch (error) {
-            console.log(error)
+            toast.error(error.response.data.message)
             dispatch(logout())
           }
         }
@@ -187,7 +187,7 @@ function NavBar() {
       checkLocalCookie();
     }
     return
-  });
+  },[dispatch, isLoggedIn, user]);
 
   useEffect(() => {
     async function fetch() {

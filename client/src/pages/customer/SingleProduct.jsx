@@ -3,13 +3,13 @@ import { useState } from "react";
 import ProductRatings from "../../components/ProductReting";
 import { useDispatch, useSelector } from "react-redux";
 import { setCartList } from "../../store/usersSlice";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 
 const ProductPage = () => {
   const dispatch = useDispatch();
   const { _id } = useParams();
-  const [product, setProduct] = useState({})
+  const [product, setProduct] = useState({});
   const { cartList, currency } = useSelector((state) => state?.Users);
   const [selectedImage, setSelectedImage] = useState(product.imageUrl);
   const [selectedSize, setSelectedSize] = useState(product.selectedSize);
@@ -37,30 +37,49 @@ const ProductPage = () => {
       dispatch(setCartList([...(cartList || []), cartItem]));
     }
   };
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
-    if(_id){
-      setLoading(true)
+    if (_id) {
+      setLoading(true);
       async function fetch() {
         try {
           const response = await axios.get(`/product/single/${_id}`);
-          setProduct(response.data.data)
-          setSelectedImage(response.data.data.imageUrl)
-          setSelectedSize(response.data.data.selectedSize)
-          setLoading(false)
+          setProduct(response.data.data);
+          setSelectedImage(response.data.data.imageUrl);
+          setSelectedSize(response.data.data.selectedSize);
+          setLoading(false);
         } catch (error) {
-          console.log(error?.response?.data?.message)
-          setLoading(false)
+          console.log(error?.response?.data?.message);
+          setLoading(false);
         }
       }
-      fetch()
+      fetch();
     }
-  }, [_id])
-if(loading){
-  return (
-    <h1>Loading...</h1>
-  )
-}
+  }, [_id]);
+const [relatedProducts, setRelatedProducts]= useState([]);
+  useEffect(() => {
+    if (product._id) {
+      async function fetch() {
+        try {
+          const res = await axios.get(`/product/sub-category/${product.subCategory}`);
+          if (res.data.data) {
+            const relProducts = res.data.data;
+            setRelatedProducts(relProducts.filter((prod) => (prod._id !== product._id)).slice(0, 4));
+          }
+        } catch (error) {
+          console.log(error)
+        }
+      }
+      fetch();
+    }
+  }, [product]);
+  if (loading) {
+    return (
+      <h1 className="min-h-screen dark:bg-gray-700 dark:text-white">
+        Loading...
+      </h1>
+    );
+  }
   return (
     <div className="bg-white dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
       {/* Main Product Section */}
@@ -142,30 +161,33 @@ if(loading){
               })}
             </div>
             <p className="mx-2">
-              Rated {averageStar ? averageStar.toFixed(1): 0} stars by {totalReviews} reviews
+              Rated {averageStar ? averageStar.toFixed(1) : 0} stars by{" "}
+              {totalReviews} reviews
             </p>
           </div>
 
           {/* Size Options */}
-          {product?.availableSize?.length > 1 && <div className="space-y-2">
-            <h3 className="font-semibold">Size</h3>
-            <div className="flex space-x-2">
-              {product.availableSize &&
-                product.availableSize.map((size) => (
-                  <button
-                    key={size}
-                    className={`px-4 py-2 border ${
-                      selectedSize === size
-                        ? "border-indigo-600 dark:border-indigo-400"
-                        : "border-gray-300 dark:border-gray-600"
-                    }`}
-                    onClick={() => setSelectedSize(size)}
-                  >
-                    {size}
-                  </button>
-                ))}
+          {product?.availableSize?.length > 1 && (
+            <div className="space-y-2">
+              <h3 className="font-semibold">Size</h3>
+              <div className="flex space-x-2">
+                {product.availableSize &&
+                  product.availableSize.map((size) => (
+                    <button
+                      key={size}
+                      className={`px-4 py-2 border ${
+                        selectedSize === size
+                          ? "border-indigo-600 dark:border-indigo-400"
+                          : "border-gray-300 dark:border-gray-600"
+                      }`}
+                      onClick={() => setSelectedSize(size)}
+                    >
+                      {size}
+                    </button>
+                  ))}
+              </div>
             </div>
-          </div>}
+          )}
 
           {/* Add to Cart Button */}
           <button
@@ -216,7 +238,7 @@ if(loading){
         <div className="space-y-4 max-h-96 overflow-y-scroll custom-scrollbar">
           {/* Reviews*/}
 
-          {totalReviews > 0 ?
+          {totalReviews > 0 ? (
             product.reviews.map((review, i) => (
               <div
                 key={i}
@@ -257,7 +279,10 @@ if(loading){
                   {review.text}
                 </p>
               </div>
-            )):<h1>No reviews for this product</h1>}
+            ))
+          ) : (
+            <h1>No reviews for this product</h1>
+          )}
         </div>
       </div>
 
@@ -265,38 +290,20 @@ if(loading){
       <div className="container mx-auto px-4 py-10">
         <h2 className="text-2xl font-bold">Customers also purchased</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-6">
-          <div className="text-center">
+          {
+            relatedProducts && relatedProducts.map((product)=>(
+              <Link
+              to={`/product/${product._id}`}
+               key={product._id} className="text-center">
             <img
-              src="https://via.placeholder.com/150"
+              src={product.imageUrl}
               alt="Product"
               className="w-full h-auto object-cover rounded-lg"
             />
-            <p className="mt-2">Basic Tee - $20</p>
-          </div>
-          <div className="text-center">
-            <img
-              src="https://via.placeholder.com/150"
-              alt="Product"
-              className="w-full h-auto object-cover rounded-lg"
-            />
-            <p className="mt-2">Gray Tee - $22</p>
-          </div>
-          <div className="text-center">
-            <img
-              src="https://via.placeholder.com/150"
-              alt="Product"
-              className="w-full h-auto object-cover rounded-lg"
-            />
-            <p className="mt-2">Pink Tee - $25</p>
-          </div>
-          <div className="text-center">
-            <img
-              src="https://via.placeholder.com/150"
-              alt="Product"
-              className="w-full h-auto object-cover rounded-lg"
-            />
-            <p className="mt-2">Black Tee - $20</p>
-          </div>
+            <p className="mt-2 text-xs lg:text-lg">{product.title} - {product.price} BDT</p>
+          </Link>
+            ))
+          }
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import WaitingForRedirect from "../../components/Waiting";
 import PayPalCheckoutButton from "./Paypal";
+import { useSelector } from "react-redux";
 
 function PaymentPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -10,7 +11,14 @@ function PaymentPage() {
   const [paymentMethod, setPaymentMethod] = useState("cashOnDelivery");
   const query = searchParams.get("paymentMethod");
   const [order, setOrder] = useState({});
-  const navigate = useNavigate();
+  const { isLoggedIn } = useSelector((state) => state.auth);
+  const navigate = useNavigate()
+
+  React.useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/login");
+    }
+  }, [isLoggedIn, navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

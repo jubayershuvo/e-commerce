@@ -31,7 +31,7 @@ const ProductList = () => {
     <>
       {product._id ? (
         <div>
-          <UpdateProduct product={product} setProduct={setProduct}/>
+          <UpdateProduct product={product} setProduct={setProduct} setProducts={setProducts}/>
         </div>
       ) : (
         <div className="h-screen overflow-y-scroll custom-scrollbar bg-white dark:bg-gray-900 p-4 shadow-md mx-auto">
@@ -76,7 +76,9 @@ const ProductList = () => {
                     ) : (
                       <p className="h-3"> </p>
                     )}
-                    {product.price !== product.regularPrice && (
+                    {
+                      product.inStock ? <>
+                      {product.price !== product.regularPrice && (
                       <p className="md:text-sm text-xs font-semibold opacity-50 line-through">
                         {product.regularPrice?.toFixed(2)} BDT
                       </p>
@@ -84,6 +86,10 @@ const ProductList = () => {
                     <p className="md:text-sm text-xs font-semibold">
                       {product.price?.toFixed(2)} BDT
                     </p>
+                      </>:<>
+                      <p className="text-red-500 pt-1">Out of stock</p>
+                      </>
+                    }
                   </div>
                 </div>
 

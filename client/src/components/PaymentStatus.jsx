@@ -1,8 +1,17 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const PaymentStatus = ({ status, orderId }) => {
+  const { isLoggedIn } = useSelector((state) => state.auth);
   const navigate = useNavigate()
+
+  React.useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/login");
+    }
+  }, [isLoggedIn, navigate]);
+
   let message, backgroundColor, textColor;
 
   switch (status) {

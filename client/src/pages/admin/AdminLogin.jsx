@@ -1,50 +1,41 @@
-import axios from 'axios';
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { adminLogin } from '../../store/adminSlice';
-import { useNavigate } from 'react-router-dom';
-import toast, { Toaster } from 'react-hot-toast';
+import axios from "axios";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { adminLogin } from "../../store/adminSlice";
+import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
 const AdminLogin = () => {
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
-  const [darkMode, setDarkMode] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const [login, setLogin] = useState('')
-  const [password, setPassword] = useState('')
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
 
-    const handleSubmit = async(e)=>{
-        e.preventDefault()
-        if(login && password){
-            try {
-                const res = await axios.post('/admin/login',{
-                    login,
-                    password
-                })
-                dispatch(adminLogin(res.data.data))
-                navigate('/admin')
-            } catch (error) {
-                toast.error(error.response.data.message)
-                console.log(error)
-            }
-        }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (login && password) {
+      const loading = toast.loading("Fetching data...!");
+      try {
+        const res = await axios.post("/admin/login", {
+          login,
+          password,
+        });
+        dispatch(adminLogin(res.data.data));
+        toast.success("Logged succesfully", { id: loading });
+        navigate("/admin");
+      } catch (error) {
+        toast.error(error.response.data.message, { id: loading });
+        console.log(error);
+      }
     }
+  };
 
   return (
-    <div className={`${darkMode ? 'dark' : ''}`}>
-        <Toaster position='top-center'/>
+    <div>
+      <Toaster position="top-center" />
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
         <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
-          {/* Toggle for Dark Mode */}
-          <div className="flex justify-end mb-4">
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="text-gray-600 dark:text-gray-400"
-            >
-              {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
-            </button>
-          </div>
-
           {/* Title */}
           <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">
             Admin Login
@@ -59,7 +50,7 @@ const AdminLogin = () => {
               <input
                 type="text"
                 value={login}
-                onChange={(e)=> setLogin(e.target.value)}
+                onChange={(e) => setLogin(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring focus:ring-blue-500"
                 placeholder="Enter your email or username"
               />
@@ -72,7 +63,7 @@ const AdminLogin = () => {
               <input
                 type="password"
                 value={password}
-                onChange={(e)=> setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring focus:ring-blue-500"
                 placeholder="Enter your password"
               />

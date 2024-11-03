@@ -5,11 +5,6 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/userModel.js";
 
-const cookieOptions = {
-  httpOnly: true, // Prevent access from JavaScript
-  secure: true, // Send only over HTTPS in production
-  sameSite: "strict", // Protect against CSRF attacks
-};
 const genAdminAccessAndRefreshToken = async (adminId) => {
   try {
     const admin = await User.findById(adminId);
@@ -98,35 +93,6 @@ export const logoutAdmin = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, `User logged out successfully..!`));
 });
 
-export const refreshAccessToken = asyncHandler(async (req, res) => {
-  const userRefreshToken =
-    req.body.adminRefreshToken ||
-    req.header("Authorization")?.replace("Bearer", "").trim();
-  try {
-    if (!userRefreshToken) {
-      throw new ApiError(404, "Login again..!");
-    }
-    const decoded = jwt.verify(userRefreshToken, refresh_token_secret_key);
-    const user = await User.findOne({ _id: decoded?._id }).select("-password");
-
-    if (!user) {
-      throw new ApiError(404, "Login Expired...!");
-    }
-
-    const { adminAccessToken } = await genAdminAccessAndRefreshToken(user._id);
-    return res
-      .status(200)
-      .cookie("adminAccessToken", adminAccessToken, cookieOptions)
-      .cookie("adminVerify", "AdminVerifier")
-      .json(new ApiResponse(200, "Token refreshed", user));
-  } catch (error) {
-    return res.status(error.statusCode || 500).json({
-      status: error.statusCode,
-      success: false,
-      message: error.message,
-    });
-  }
-});
 
 export const currentAdmin = asyncHandler(async (req, res) => {
   try {
@@ -234,7 +200,7 @@ export const makeAdmin = asyncHandler(async (req, res) => {
     const users = await User.find().populate("shippingAddress");
     return res
       .status(200)
-      .json(new ApiResponse(200, "User returned..!", users));
+      .json(new ApiResponse(200, "Done..!", users));
   } catch (error) {
     return res.status(error.statusCode || 500).json({
       status: error.statusCode,
@@ -255,13 +221,13 @@ export const removeAdmin = asyncHandler(async (req, res) => {
     }
 
     await User.findByIdAndUpdate(_id, {
-      role: "user",
+      role: "customer",
     });
 
     const users = await User.find().populate("shippingAddress");
     return res
       .status(200)
-      .json(new ApiResponse(200, "User returned..!", users));
+      .json(new ApiResponse(200, "done..!", users));
   } catch (error) {
     return res.status(error.statusCode || 500).json({
       status: error.statusCode,

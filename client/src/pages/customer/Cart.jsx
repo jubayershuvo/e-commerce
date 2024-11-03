@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import axios from "axios"
 import { XMarkIcon } from "@heroicons/react/24/outline";
@@ -9,6 +7,7 @@ import { setCartClose, setCartList, setDiscount, setDiscountCupon, setDiscounted
 
 export default function Cart() {
   const dispatch = useDispatch();
+
   const { 
     isCartOpen, 
     currency, 
@@ -253,11 +252,11 @@ const [couponLoading,setCouponLoading] = useState(false)
                 </div>
                 <div className="flex justify-between text-base font-medium text-gray-900 dark:text-gray-100">
                   <p>Cupon</p>
-                  <p>-{`${discountedCuponPrice} ${currency}`}</p>
+                  <p>-{`${Math.floor(discountedCuponPrice).toFixed(2)} ${currency}`}</p>
                 </div>
                 <div className="flex justify-between text-base font-medium text-gray-900 dark:text-gray-100">
                   <p>Payable Amount</p>
-                  <p>{`${payableAmount} ${currency}`}</p>
+                  <p>{`${Math.ceil(payableAmount).toFixed(2)} ${currency}`}</p>
                 </div>
                 <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
                   Shipping and taxes calculated at checkout.
@@ -291,7 +290,7 @@ const [couponLoading,setCouponLoading] = useState(false)
 
                 <div className="mt-6">
                   <Link
-                    to={'/checkout?step=1'}
+                    to={'/checkout?step=2'}
                     onClick={() => dispatch(setCartClose())}
                     className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400"
                   >

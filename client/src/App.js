@@ -33,6 +33,7 @@ import CategoryPage from "./pages/admin/ManageCategory.jsx";
 import CouponManager from "./pages/admin/CouponManager.jsx";
 import UpdateProfile from "./pages/customer/UpdateProfile.jsx";
 import VerifyEmail from "./components/VerifyEmail.jsx";
+import DeleteAccount from "./pages/customer/DeleteAccount.jsx";
 
 function App() {
   return (
@@ -81,6 +82,7 @@ function UserRouter() {
         <Route path="set-password" element={<SetPassword />} />
 
         <Route path="change-password" element={<ChangePassword />} />
+        <Route path="account-delete" element={<DeleteAccount />} />
         <Route path="test" element={<Test/>} />
       </Routes>
       <Footer />

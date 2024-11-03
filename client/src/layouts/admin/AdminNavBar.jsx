@@ -14,7 +14,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import DarkMode from "../../components/DarkMode";
 import { Toaster } from "react-hot-toast";
-import axios from "axios";
 import { adminLogout } from "../../store/adminSlice";
 import { AdjustmentsVerticalIcon } from "@heroicons/react/24/outline";
 import { FaTag } from "react-icons/fa";
@@ -41,14 +40,7 @@ const AdminNavbar = () => {
         if (exists) {
           return;
         } else {
-          try {
-            await axios.post("/admin/refresh-token", {
-              adminRefreshToken: admin.adminRefreshToken,
-            });
-          } catch (error) {
-            console.log(error);
-            dispatch(adminLogout());
-          }
+          dispatch(adminLogout());
         }
       };
 
@@ -136,7 +128,9 @@ const AdminNavbar = () => {
       {/* Mobile navbar */}
       <div className="md:hidden flex items-center w-full bg-white dark:bg-gray-900 px-4 py-3 border-b dark:border-gray-700 fixed z-10">
         <span className="text-xl font-bold text-gray-900 dark:text-white">
-          Logo
+          <Link to={"/admin"}>
+            <img src="/logo.png" alt="" className="h-6" />
+          </Link>
         </span>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -164,7 +158,7 @@ const AdminNavbar = () => {
                 <ChartBarIcon className="h-6 w-6 mr-2" />
                 Dashboard
               </NavLink>
-              <hr className="mb-5"/>
+              <hr className="mb-5" />
               <NavLink
                 to="/admin/customers"
                 className="flex mb-3 items-center text-blue-600"

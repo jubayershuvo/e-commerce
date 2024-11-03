@@ -1,0 +1,49 @@
+
+Common Features:
+
+• Dark and Light mode options.
+• Enhanced security measures.
+• Mail Service by Gmail.
+• Have search option anywhere.
+• Save and delete media files.
+• Media storage powered by Cloudinary.
+
+
+For Users:
+
+• Browse products without needing to log in.
+• Access complete product details on the product details page.
+• Add multiple products to the cart and proceed to order.
+• Update product sizes and quantities in the cart.
+• Remove products or duplicate items in the cart.
+• Use coupon codes for discounts.
+• View detailed price breakdowns in the cart and proceed to checkout.
+• Login required to place orders.
+• Login, Sign-Up (email verification required), and Forgot Password (recovery by email or username) features.
+• View order details and update or set a new shipping address.
+• Confirmed shipping address and order summary provided at checkout.
+• Multiple payment methods available (Cash on Delivery, Bkash, SSLCommerz, PayPal).
+• Receive a payment confirmation message.
+• All orders listed in "My Orders" page.
+• Track order status on the Order Details page.
+• Profile update options: Profile Picture, Name, Email (verification required), Password (old password required).
+• Users can delete their account along with all associated media files.
+
+
+For Admin:
+
+• Comprehensive dashboard (Pending Orders, Total Orders, Total Sales, Total Products).
+• Ability to ban/unban users.
+• Promote users to admin or demote admins to users.
+• Login access.
+• View and edit all products on the products page.
+• Add new products with detailed information (gender, category, sub-category, title, description, discount, images).
+• Manage all orders on the orders page.
+• Access order details and payment statements.
+• Update order statuses and messages.
+• Track all payment statements with detailed information.
+• Add or delete categories and subcategories.
+• Add and manage coupons (Code, Discount) with options to delete as needed.
+
+
+Note: Additional features can be implemented based on your requirements.

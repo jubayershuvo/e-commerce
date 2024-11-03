@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { logout } from '../store/authSlice';
+import { logout } from '../../store/authSlice';
 
 function DeleteAccount() {
   const dispatch = useDispatch()
@@ -12,7 +12,7 @@ function DeleteAccount() {
   const {isLoggedIn} = useSelector(state => state?.auth);
   useEffect(() => {
     if(!isLoggedIn){
-      navigate('/login');
+      navigate('/');
     }
   }, [isLoggedIn,navigate]);
     const [password, setPassword] = useState('');
@@ -50,9 +50,7 @@ function DeleteAccount() {
         try {
 
           // Send POST request to API endpoint
-           await axios.post('http://localhost:8080/api/v1/users/delete-user', {password}, {
-            withCredentials: true 
-          });
+           await axios.post('/user/delete-user', {password});
 
           toast.success('Account deleted successfully!',{id: loadingToast});
           dispatch(logout());

@@ -1,13 +1,21 @@
 import React from "react";
-import axios from 'axios'
+import axios from "axios";
 import { FaMapMarkerAlt, FaPhoneAlt, FaUser } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../store/authSlice";
 import { clearAll } from "../store/usersSlice";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
-function OrderSummary({ handleNext, handleBack, user }) {
-  const navigate = useNavigate()
+function OrderSummary({ handleBack, user }) {
+  const { isLoggedIn } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/login");
+    }
+  }, [isLoggedIn, navigate]);
   const { currency, cartList, discountedCuponPrice } = useSelector(
     (state) => state?.Users
   );
@@ -19,39 +27,34 @@ function OrderSummary({ handleNext, handleBack, user }) {
     0
   );
 
-  const filterProducts = cartList.map(product => {
+  const filterProducts = cartList.map((product) => {
     return { item: product._id, quantity: product.quantity };
-  })
+  });
   const shipping = 100;
   const total = subtotal + shipping - Math.floor(Number(discountedCuponPrice));
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const data ={
+    const dataSend = {
       shippingCost: Number(shipping),
       couponDiscount: Math.floor(Number(discountedCuponPrice)),
-      products: filterProducts
-
-    }
+      products: filterProducts,
+    };
+    const loading = toast.loading("Creating order..");
     try {
-      // Submit the data if validation passed
-      const response = await axios.post("/order/add", data);
-    
+      const response = await axios.post("/order/add", dataSend);
+
       if (response?.data?.data) {
         const data = response.data.data;
         navigate(`/payment/${data.order._id}`);
         dispatch(login(data.user));
-      } else {
-        // Handle unexpected response structure
-        console.log("Error adding address. Please try again.");
+        toast.success("Order saved as pending...", { id: loading });
       }
     } catch (error) {
-      // Handle request errors
-      console.error("Error submitting the form: ", error);
+      toast.error(error.response.data.message, { id: loading });
+      navigate("/products");
     } finally {
-      // Clear all even after an error if this behavior is intended
       dispatch(clearAll());
     }
-    handleNext();
   };
   return (
     <>
@@ -96,7 +99,6 @@ function OrderSummary({ handleNext, handleBack, user }) {
           {/* Order Items */}
           <div className="mb-8">
             {orderItems.map((item, i) => (
-              
               <div
                 key={i}
                 className="flex items-center justify-between mb-6 border-b border-gray-200 dark:border-gray-700 pb-4"
@@ -112,18 +114,27 @@ function OrderSummary({ handleNext, handleBack, user }) {
                       {item.title}
                     </h4>
                     <div className="flex">
-                    <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm">
-                      {`Qty: ${item.quantity}`}
-                    </p>
-                    {item.selectedSize && <p className="text-gray-600 px-2 dark:text-gray-400 text-xs md:text-sm">
-                      {`Size: ${item.selectedSize}`}
-                    </p>}
+                      <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm">
+                        {`Qty: ${item.quantity}`}
+                      </p>
+                      {item.selectedSize && (
+                        <p className="text-gray-600 px-2 dark:text-gray-400 text-xs md:text-sm">
+                          {`Size: ${item.selectedSize}`}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
-                <p className="text-gray-800 dark:text-gray-200 font-semibold text-sm md:text-base">
-                  {`${(item.price * item.quantity).toFixed(2)} ${currency}`}
-                </p>
+                <div className="">
+                  <p className="text-gray-800 dark:text-gray-200 font-semibold text-sm md:text-base">
+                    {`${(item.price * item.quantity).toFixed(2)} ${currency}`}
+                  </p>
+                  <p className="text-gray-800 dark:text-gray-200 font-semibold text-xs md:text-sm line-through opacity-50">
+                    {`${(item.regularPrice * item.quantity).toFixed(
+                      2
+                    )} ${currency}`}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
@@ -154,7 +165,9 @@ function OrderSummary({ handleNext, handleBack, user }) {
                 Coupon
               </span>
               <span className="text-gray-800 dark:text-gray-200 font-semibold text-sm md:text-base">
-                {`-${Math.floor(Number(discountedCuponPrice)).toFixed(2)} ${currency}`}
+                {`-${Math.floor(Number(discountedCuponPrice)).toFixed(
+                  2
+                )} ${currency}`}
               </span>
             </div>
 

@@ -1,11 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LogoutBtn from "./LogoutBtn";
 
 const MiniProfile = () => {
-  const { user } = useSelector((state) => state.auth);
+  const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false);
+  const { user, isLoggedIn } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if(!isLoggedIn){
+      navigate('/login')
+    }
+  }, [isLoggedIn, navigate])
+  
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -40,6 +48,9 @@ const MiniProfile = () => {
           <hr className="opacity-55" />
           <Link
             to={"/myorders"}
+            onClick={() => {
+              setIsOpen(false);
+            }}
             className="block w-full text-left px-4 py-1 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             My Orders

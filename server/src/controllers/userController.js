@@ -369,7 +369,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
       throw new ApiError(404, "Login Expired...!");
     }
     if (user.isBanned) {
-      throw new ApiError(404, "User banned...!");
+      return res.clearCookie("accessToken").clearCookie("accessVerify");
     }
 
     const { accessToken } = await genAccessAndRefreshToken(user._id);

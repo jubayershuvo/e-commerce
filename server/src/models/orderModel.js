@@ -72,37 +72,26 @@ const orderSchema = new Schema(
 // Pre-save hook to calculate total and order price before saving
 orderSchema.pre("save", async function (next) {
   try {
-    // Populate the 'item' field with details from the 'Product' model
-    await this.populate({
-      path: "products.item",
-    });
-
-    // Calculate the total product price and order price
-    let productsTotal = this.products.reduce((acc, product) => {
-      return acc + product.item.price * product.quantity;
-    }, 0);
-
-    // Calculate total product discount (regular price - actual price) * quantity
-    let productsDiscount = this.products.reduce((acc, product) => {
-      return (
-        acc +
-        (product.item.regularPrice - product.item.price) * product.quantity
-      );
-    }, 0);
-
-    // Combine product discounts with the coupon discount
-    this.discount = Math.floor(productsDiscount);
-
-    // Calculate the final total after discounts and shipping
-    this.total = Math.ceil(
-      productsTotal + this.shippingCost - this.couponDiscount
+    await this.populate("products.item");
+    
+    let productsTotal = this.products.reduce(
+      (acc, product) => acc + product.item.price * product.quantity,
+      0
+    );
+    
+    let productsDiscount = this.products.reduce(
+      (acc, product) =>
+        acc + (product.item.regularPrice - product.item.price) * product.quantity,
+      0
     );
 
-    // Calculate the original order price (before discounts)
-    let orderTotal = this.products.reduce((acc, product) => {
-      return acc + product.item.regularPrice * product.quantity;
-    }, 0);
+    this.discount = Math.floor(productsDiscount);
+    this.total = Math.ceil(productsTotal + this.shippingCost - this.couponDiscount);
 
+    let orderTotal = this.products.reduce(
+      (acc, product) => acc + product.item.regularPrice * product.quantity,
+      0
+    );
     this.orderPrice = orderTotal;
 
     next();
@@ -110,5 +99,6 @@ orderSchema.pre("save", async function (next) {
     next(err);
   }
 });
+
 
 export const Order = mongoose.model("Order", orderSchema);

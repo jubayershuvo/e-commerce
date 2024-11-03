@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const UpdateProduct = ({ product, setProduct }) => {
+const UpdateProduct = ({ product, setProduct, setProducts }) => {
   const genders = [
     { value: "men", name: "Men" },
     { value: "women", name: "Women" },
@@ -10,7 +10,7 @@ const UpdateProduct = ({ product, setProduct }) => {
   ];
 
   const [formData, setFormData] = useState({
-    ...product
+    ...product,
   });
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -19,9 +19,12 @@ const UpdateProduct = ({ product, setProduct }) => {
   const [previews, setPreviews] = useState([]);
   const [genderName, setGenderName] = useState(product.gender.value);
   const [categoryName, setCategoryName] = useState(product.category.value);
-  const [subCategoryName, setSubCategoryName] = useState(product.subCategory.value);
+  const [subCategoryName, setSubCategoryName] = useState(
+    product.subCategory.value
+  );
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
+  const [inStock, setInStock] = useState(product.inStock);
 
   useEffect(() => {
     if (formData.regularPrice && formData.regularPrice > 0) {
@@ -82,6 +85,10 @@ const UpdateProduct = ({ product, setProduct }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!subCategoryName) {
+      toast.error("Set category..");
+      return;
+    }
     const UpdateProductLoading = toast.loading("Updating product...");
     try {
       const data = new FormData();
@@ -93,12 +100,17 @@ const UpdateProduct = ({ product, setProduct }) => {
       data.append("genderName", genderName);
       data.append("categoryName", categoryName);
       data.append("subCategoryName", subCategoryName);
+      data.append("inStock", inStock);
 
       if (image) data.append("productImage", image);
       images.forEach((img) => data.append("images", img));
 
-      const response = await axios.post(`/admin/product/update/${product._id}`, data);
+      const response = await axios.post(
+        `/admin/product/update/${product._id}`,
+        data
+      );
       if (response.data) {
+        setProducts(response.data.data);
         setFormData({
           title: "",
           description: "",
@@ -108,7 +120,7 @@ const UpdateProduct = ({ product, setProduct }) => {
         });
         setImage(null);
         setImages([]);
-        setProduct({})
+        setProduct({});
         setPreview(null);
         setPreviews([]);
         toast.success("Product updated successfully!", {
@@ -121,7 +133,6 @@ const UpdateProduct = ({ product, setProduct }) => {
       });
     }
   };
-
   return (
     <>
       {product._id && (
@@ -215,6 +226,19 @@ const UpdateProduct = ({ product, setProduct }) => {
                     )}
                   </select>
                 </div>
+              </div>
+
+              <div className="">
+                <input
+                  type="checkbox"
+                  onChange={() => setInStock(!inStock)}
+                  defaultChecked={inStock}
+                  name=""
+                  id="stock"
+                />
+                <label htmlFor="stock" className="ml-2">
+                  InStock
+                </label>
               </div>
 
               {/* Title */}
@@ -378,9 +402,9 @@ const UpdateProduct = ({ product, setProduct }) => {
               </div>
 
               {/* Submit Button */}
-              <div className="flex justify-between mx-20">
+              <div className="flex justify-between mx-10 md:mx-20">
                 <button
-                  onClick={()=> setProduct({})}
+                  onClick={() => setProduct({})}
                   className="px-6 py-3 bg-gray-600 text-white rounded-lg text-sm md:text-base font-medium hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400"
                 >
                   Cancel

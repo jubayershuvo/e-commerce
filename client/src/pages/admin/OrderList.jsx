@@ -6,7 +6,7 @@ import {
   EyeIcon,
   XMarkIcon,
 } from "@heroicons/react/24/solid";
-import toast from 'react-hot-toast'
+import toast from "react-hot-toast";
 
 const statusOptions = [
   { value: "pending", label: "Pending" },
@@ -34,16 +34,17 @@ const OrderList = () => {
 
   const handleEdit = async (e) => {
     e.preventDefault();
+    const loading = toast.loading("Order updating...");
     try {
-      const res = await axios.post('/admin/order/update/status',{
-        orderId:order._id,
+      const res = await axios.post("/admin/order/update/status", {
+        orderId: order._id,
         status,
-        message
+        message,
       });
-      setOrders(res.data.data)
-      toast.success("Status updated..")
+      setOrders(res.data.data);
+      toast.success("Status updated..", { id: loading });
     } catch (error) {
-      toast.error(error.response.message)
+      toast.error(error.response.data.message, { id: loading });
     }
     setMessage("");
     setEdit(false);
@@ -199,7 +200,9 @@ const OrderList = () => {
                       : "bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-200"
                   }`}
                 >
-                  {order.status === 'ontheway' ? 'On The Way' : capitalizeFirstLetter(order.status)}
+                  {order.status === "ontheway"
+                    ? "On The Way"
+                    : capitalizeFirstLetter(order.status)}
                 </span>
               </div>
 
@@ -211,7 +214,7 @@ const OrderList = () => {
                 <ul className="list-disc pl-4 text-sm text-gray-700 dark:text-gray-400">
                   {order.products.map((product, index) => (
                     <li key={index}>
-                      {product.item?.title} - 
+                      {product.item?.title} -
                       {Number(product.item?.price).toFixed(2)} BDT
                     </li>
                   ))}
@@ -231,12 +234,12 @@ const OrderList = () => {
               {/* Costs */}
               <div className="text-sm text-gray-900 dark:text-white">
                 <p>
-                  <span className="font-semibold">Shipping Cost:</span> 
+                  <span className="font-semibold">Shipping Cost:</span>
                   {order.shippingCost.toFixed(2)} BDT
                 </p>
                 {order.discount > 0 && (
                   <p>
-                    <span className="font-semibold">Discount:</span> 
+                    <span className="font-semibold">Discount:</span>
                     {order.discount.toFixed(2)} BDT
                   </p>
                 )}

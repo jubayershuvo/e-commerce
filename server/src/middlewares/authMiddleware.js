@@ -6,7 +6,9 @@ import { User } from "../models/userModel.js";
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
   try {
-    const token = req.cookies?.accessToken || req.header('Authorization')?.replace('Bearer','').trim();
+    const token =
+      req.cookies?.accessToken ||
+      req.header("Authorization")?.replace("Bearer", "").trim();
 
     if (!token) {
       throw new ApiError(401, "Unauthorized user, please login first...!");
@@ -49,7 +51,7 @@ export const isBanned = asyncHandler(async (req, res, next) => {
     }
 
     if (user.isBanned) {
-      return res.clearCookie("accessToken").clearCookie("adminVerify")
+      return res.clearCookie("accessToken").clearCookie("accessVerify");
     }
 
     next(); // Proceed to the next middleware

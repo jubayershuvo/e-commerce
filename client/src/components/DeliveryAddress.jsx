@@ -2,9 +2,22 @@ import * as React from "react";
 import { FaEdit, FaMapMarkerAlt, FaPhoneAlt, FaUser } from "react-icons/fa";
 import axios from "axios";
 import { login } from "../store/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 function DeliveryAddress({ handleNext, user }) {
+  const navigate = useNavigate();
+  const {  
+    cartList, 
+   } = useSelector(
+    (state) => state?.Users
+  );
+  React.useEffect(() => {
+    if(cartList.length === 0){
+      navigate("/products")
+    }
+  }, [cartList, navigate])
+  
   const availableCountry = [
     { country: "United State" },
     { country: "United Kingdom" },
@@ -57,7 +70,7 @@ function DeliveryAddress({ handleNext, user }) {
     // Validate form fields
     for (let field of requiredFields) {
       if (!data[field.key]) {
-        alert(field.message);
+        console.log(field.message);
         return; // Exit if a required field is missing
       }
     }
@@ -65,21 +78,26 @@ function DeliveryAddress({ handleNext, user }) {
     try {
       // Submit the data if validation passed
       const response = await axios.post("/address/add", data, {
-        withCredentials:true
+        withCredentials: true,
       });
 
       if (response?.data?.data) {
         dispatch(login(response.data.data));
         handleNext(); // Proceed to the next step after success
       } else {
-        alert("Error adding address. Please try again.");
+        console.log("Error adding address. Please try again.");
       }
     } catch (error) {
       console.log("Error during address submission: ", error);
-      alert("There was an error. Please try again later.");
     }
   };
+  const { isLoggedIn } = useSelector((state) => state.auth);
 
+  React.useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/login");
+    }
+  }, [isLoggedIn, navigate]);
   return (
     <>
       {isFieldsOpen === false ? (

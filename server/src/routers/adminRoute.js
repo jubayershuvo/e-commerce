@@ -5,7 +5,7 @@ import {
   updateProduct,
 } from "../controllers/productController.js";
 import { upload } from "../middlewares/multerMiddleware.js";
-import { banUser, loginAdmin, makeAdmin, refreshAccessToken, removeAdmin, unbanUser } from "../controllers/adminController.js";
+import { banUser, loginAdmin, makeAdmin, removeAdmin, unbanUser } from "../controllers/adminController.js";
 import { verifyAdminJWT } from "../middlewares/adminMiddleware.js";
 import { addCoupon, allOrders, confirmedOrders, deleteCoupon, getAllCoupon, pendingOrders, singleOrder, updateStatus, withoutP } from "../controllers/orderController.js";
 
@@ -13,11 +13,10 @@ const adminRouter = Router();
 
 
 adminRouter.route('/login').post(loginAdmin)
-adminRouter.route('/refresh-token').post(refreshAccessToken)
 adminRouter.route('/user/ban/:_id').get(verifyAdminJWT, banUser)
 adminRouter.route('/user/unban/:_id').get(verifyAdminJWT, unbanUser)
-adminRouter.route('/user/makeAdmin/:_id').get(verifyAdminJWT, makeAdmin)
-adminRouter.route('/user/removeAdmin/:_id').get(verifyAdminJWT, removeAdmin)
+adminRouter.route('/user/makeAdmin').post(verifyAdminJWT, makeAdmin)
+adminRouter.route('/user/removeAdmin').post(verifyAdminJWT, removeAdmin)
 
 adminRouter.route("/product/add").post(
   verifyAdminJWT,

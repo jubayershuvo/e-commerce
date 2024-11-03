@@ -11,8 +11,11 @@ export const addOrder = asyncHandler(async (req, res) => {
     const { shippingCost, couponDiscount, products } = req.body;
     const { _id, shippingAddress } = req.user;
 
-    if (!shippingCost || !products) {
+    if (!shippingCost) {
       throw new ApiError(400, "All fields are required.");
+    }
+    if (products.length === 0) {
+      throw new ApiError(400, "Products not found.");
     }
 
     // Create new order

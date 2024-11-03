@@ -12,6 +12,7 @@ export default function SearchProduct({ isPopupOpen, setIsPopupOpen }) {
   // Fetch products from API based on the search term
   const fetchProducts = async (query) => {
     try {
+      
       setLoading(true);
       const response = await axios.get(`/product/products/${query}`);
       setProducts(response.data.data);
@@ -20,6 +21,7 @@ export default function SearchProduct({ isPopupOpen, setIsPopupOpen }) {
       setProducts([]);
     } finally {
       setLoading(false);
+      
     }
   };
 

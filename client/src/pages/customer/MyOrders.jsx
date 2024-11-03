@@ -1,9 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios'
+import { useSelector } from "react-redux";
 
 export default function MyOrders() {
   const [orders, setOrders] = useState([])
+  const { isLoggedIn } = useSelector((state) => state.auth);
+  const navigate = useNavigate()
+
+  React.useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/login");
+    }
+  }, [isLoggedIn, navigate]);
+
 
   useEffect(() => {
     async function fetch() {
@@ -15,11 +25,10 @@ export default function MyOrders() {
           setOrders(response.data.data)
            // Proceed to the next step after success
         } else {
-          alert("Error adding address. Please try again.");
+          console.log("Error adding address. Please try again.");
         }
       } catch (error) {
         console.log("Error during address submission: ", error);
-        alert("There was an error. Please try again later.");
       }
     }
     fetch()
