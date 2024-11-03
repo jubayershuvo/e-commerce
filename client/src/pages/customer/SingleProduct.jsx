@@ -190,7 +190,8 @@ const [relatedProducts, setRelatedProducts]= useState([]);
           )}
 
           {/* Add to Cart Button */}
-          <button
+          {
+            product.inStock ? <button
             onClick={addToCart}
             disabled={cartList.some((product) => product._id === cartItem._id)}
             className="w-full disabled:opacity-50 bg-indigo-600 hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white px-4 py-2 rounded-lg shadow-md"
@@ -198,7 +199,8 @@ const [relatedProducts, setRelatedProducts]= useState([]);
             {cartList.some((product) => product._id === cartItem._id)
               ? "Added"
               : "Add To Cart"}
-          </button>
+          </button>:<p className="w-full text-center text-lg text-red-500">Out of stock</p>
+          }
 
           {/* Product Description */}
           <div className="space-y-2">

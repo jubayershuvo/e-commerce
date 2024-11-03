@@ -112,8 +112,8 @@ export default function Products() {
             
 
               {/* Product grid */}
-              <div className="grid lg:col-span-3 lg:h-full overflow-y-scroll custom-scrollbar">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4  lg:row-span-2  gap-6">
+              <div className="grid lg:col-span-4 lg:h-full overflow-y-scroll custom-scrollbar">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5  lg:row-span-2  gap-6">
                   {products.length > 0 ? products.map((product, index) => (
                     <div
                       key={index}

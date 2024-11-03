@@ -28,7 +28,7 @@ const ProductCard = ({ product }) => {
     }
   };
   return (
-    <div className="bg-white relative text-xs z-50 md:text-base dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden flex flex-col justify-between hover:shadow-xl transform hover:scale-105 transition duration-300">
+    <div className="bg-white relative text-xs z-40 md:text-base dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden flex flex-col justify-between hover:shadow-xl transform hover:scale-105 transition duration-300">
       {product.inStock === true && (
         <div className="bg-transparent text-right w-20 h-20 absolute z-50 -right-6 top-0 rounded-lg">
           {product.discount > 0 && (

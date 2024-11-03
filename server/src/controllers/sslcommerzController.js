@@ -128,7 +128,7 @@ export const successPay = asyncHandler(async (req, res) => {
         orderId,
         {
           status: "confirmed",
-          message: "Your order confirmed succesfully.",
+          message: "Your order confirmed successfully.",
           payment: payment._id,
         },
         { new: true }

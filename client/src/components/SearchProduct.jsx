@@ -63,7 +63,7 @@ export default function SearchProduct({ isPopupOpen, setIsPopupOpen }) {
           </button>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 max-h-96 overflow-y-auto custom-scrollbar">
           {loading && (
             <p className="text-center text-gray-500 dark:text-gray-400">
               Loading...
